@@ -1,114 +1,188 @@
-🤖 PromptBuddy
+# PromptBuddy
 
-PromptBuddy is a full-stack AI-powered platform that helps users generate optimized, intent-based prompts using multiple LLMs including OpenAI, Gemini, Claude, and Cohere. It supports prompt generation for various purposes like Code Generation, Image Generation, Research, and more — with backend logic that randomly selects one of the available APIs to generate a result.
-
----
-
-## 🌐 Live Demo (Coming Soon)
-
-🚀 Deployed Link: _to be added after deployment_
+**AI-Powered Prompt Template Generator** - A full-stack application that helps you create optimized, intent-based prompts using 21 specialized prompt structure types.
 
 ---
 
-## 📂 Project Structure
+## Overview
 
+PromptBuddy transforms your basic prompts into structured, AI-optimized templates. Unlike traditional prompt generators, PromptBuddy uses intelligent template matching to select the best prompt structure for your use case - all without requiring external API keys.
+
+---
+
+## Features
+
+### Core Functionality
+
+- **21 Prompt Structure Types** - Organized across 7 categories:
+  - **Basic**: Instruction, Contextual, Role-Based
+  - **Shot-Based**: Zero-Shot, One-Shot, Few-Shot
+  - **Reasoning**: Chain-of-Thought, Self-Consistency, Socratic
+  - **Structured**: Template, Goal-Oriented, Constraint-Based
+  - **Advanced**: Meta-Prompt, Refinement, Evaluation
+  - **Collaborative**: Multi-Agent, Delegation, Planning
+  - **Creative**: Creative, Transformation, RAG
+
+- **Smart Prompt Suggestions** - Keyword analysis recommends the best prompt types based on your input
+
+- **Prompt Quality Score** - 5-dimension analysis (Length, Specificity, Structure, Actionability, Clarity) with letter grades
+
+### Productivity Features
+
+- **Prompt Library** - Save and organize your prompts with search functionality
+- **History Tracking** - Access your last 50 generated prompts
+- **Industry Presets** - Pre-configured prompts for 6 domains:
+  - Software Development
+  - Marketing
+  - Education
+  - Business
+  - Legal
+  - Creative Writing
+
+- **Export Options** - Download prompts in Markdown, JSON, or Plain Text format
+
+- **Preview Modes** - View prompts in Default, ChatGPT-style, Claude-style, or Raw format
+
+### User Experience
+
+- **Dark Mode** - Full theme support with persistent preference
+- **Keyboard Shortcuts**:
+  - `Ctrl+Enter` - Generate prompt
+  - `Ctrl+D` - Toggle dark mode
+  - `Ctrl+/` - Show shortcuts help
+  - `Esc` - Close dialogs
+
+---
+
+## Tech Stack
+
+| Layer | Technologies |
+|-------|-------------|
+| Frontend | React, Tailwind CSS, Vite |
+| Backend | Flask, Python |
+| Storage | localStorage (client-side) |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v16+)
+- Python (v3.8+)
+
+### Installation
+
+**1. Clone the Repository**
 ```bash
-PromptBuddy/
-├── backend/           # Flask Backend
-│   ├── flask_app.py   # Main Flask App
-│   ├── .env           # Stores API keys
-│   ├── requirements.txt
-│   └── ...
-├── frontend/          # React Frontend
-│   ├── src/
-│   │   ├── App.js
-│   │   └── ...
-│   └── package.json
-├── .gitignore
-└── README.md
-🔧 Features
-✅ Intent-based prompt optimization
-✅ Random LLM API selection (OpenAI, Gemini, Claude, Cohere)
-✅ Works with free or paid keys
-✅ Supports 5 types of generation:
-    • Image Generation
-    • Code Generation
-    • Research
-    • General Knowledge
-    • Latest Information
-✅ Future-ready (add more LLMs easily)
-✅ Cross-origin support enabled
-✅ Frontend-backend fully connected
-
-🚀 Getting Started
-1. Clone the Repository
-git clone https://github.com/<your-username>/PromptBuddy.git
+git clone https://github.com/your-username/PromptBuddy.git
 cd PromptBuddy
-2. Backend Setup (Flask)
-⏬ Create a virtual environment
+```
+
+**2. Backend Setup**
+```bash
 cd backend
 python -m venv venv
 .\venv\Scripts\activate      # Windows
-📦 Install dependencies
+# source venv/bin/activate   # macOS/Linux
 pip install -r requirements.txt
-🔐 Configure .env
+python flask_app.py
+```
+Backend runs at: http://localhost:5000
 
-Create a .env file inside /backend and add your API keys:
-
-OPENAI_API_KEY=your-openai-key
-GEMINI_API_KEY=your-gemini-key
-CLAUDE_API_KEY=your-claude-key
-COHERE_API_KEY=your-cohere-key
-Note: .env is already ignored via .gitignore
-
-▶️ Run the backend server
-flask run --host=0.0.0.0 --port=5000
-It will run at: http://localhost:5000
-
-3. Frontend Setup (React)
-cd ../frontend
+**3. Frontend Setup**
+```bash
+cd frontend
 npm install
-npm start
-It will open at: http://localhost:3000
+npm run dev
+```
+Frontend runs at: http://localhost:3000
 
-🔄 API Endpoint
-POST /generate
-Request JSON:
+---
 
+## API Reference
 
+### POST /generate
+
+Generate an optimized prompt from a base prompt.
+
+**Request:**
+```json
 {
-  "base_prompt": "I want a code to build a weather app",
-  "intent": "code_generation"
+  "base_prompt": "Create a REST API for user management",
+  "intent": "chain_of_thought"
 }
-Response JSON:
+```
 
-
+**Response:**
+```json
 {
-  "original_prompt": "...",
-  "refined_prompt": "...",
-  "model_used": "OpenAI",  // or Claude/Gemini/Cohere
+  "original_prompt": "Create a REST API for user management",
+  "optimized_prompt": "...(structured prompt template)...",
+  "intent": "chain_of_thought",
   "success": true
 }
-📦 Future Features
- Prompt history
+```
 
- User login & personalization
+---
 
- Add Anthropic, Mistral, and other APIs
+## Project Structure
 
- Deployment on Render/Vercel
+```
+PromptBuddy/
+├── backend/
+│   ├── flask_app.py          # Flask server with 21 prompt templates
+│   ├── requirements.txt
+│   └── venv/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── PromptGenerator.jsx
+│   │   │   ├── PromptOutput.jsx
+│   │   │   ├── PromptLibrary.jsx
+│   │   │   ├── PresetSelector.jsx
+│   │   │   ├── ShortcutsHelp.jsx
+│   │   │   ├── ThemeToggle.jsx
+│   │   │   └── VersionHistory.jsx
+│   │   ├── utils/
+│   │   │   ├── storage.js        # localStorage persistence
+│   │   │   ├── exporters.js      # Export functionality
+│   │   │   ├── suggestions.js    # Smart suggestions engine
+│   │   │   ├── qualityScorer.js  # Quality scoring algorithm
+│   │   │   └── presets.js        # Industry presets data
+│   │   ├── App.jsx
+│   │   └── index.css
+│   └── package.json
+└── README.md
+```
 
-🧠 Tech Stack
-Frontend	Backend	LLMs	Infra
-React	Flask	OpenAI	Node.js
-Tailwind	Python	Claude	Git/GitHub
-Axios	CORS	Gemini	.env
-dotenv	Cohere	
+---
 
-📃 License
+## Roadmap
+
+### Coming Soon
+
+- **Prompt Variables** - Support for `{{variable}}` placeholder syntax with dynamic input forms
+- **Workflow Builder** - Chain multiple prompts together for complex multi-step workflows
+- **Version Comparison** - Side-by-side diff view for prompt versions
+
+### Under Consideration
+
+- Cloud sync for prompt library
+- Team collaboration features
+- Custom prompt template creation
+- API integration with LLM providers
+
+---
+
+## License
+
 This project is licensed under the MIT License.
 
-🙋‍♂️ Author
-Shanmukha Vutikuri
-💼 Building AI tools & platforms
-📬 Feel free to reach out for collaboration!
+---
+
+## Author
+
+**Shanmukha Vutikuri**
+
+Building AI tools and platforms for enhanced productivity.
