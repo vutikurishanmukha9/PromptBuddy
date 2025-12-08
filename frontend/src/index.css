@@ -529,6 +529,128 @@ body {
 }
 
 /* ============================================
+   DARK MODE OUTPUT TEXT FIXES
+   ============================================ */
+
+/* Force dark text on light gradient backgrounds in dark mode */
+[data-theme="dark"] .bg-gradient-to-br.from-purple-50,
+[data-theme="dark"] .bg-gradient-to-r.from-purple-50,
+[data-theme="dark"] .from-purple-50 {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%) !important;
+}
+
+/* Output content area - ensure readable text */
+[data-theme="dark"] .whitespace-pre-wrap {
+  color: #e0e7ff !important;
+}
+
+/* Prompt output box */
+[data-theme="dark"] .bg-gradient-to-br.from-purple-50.to-indigo-50,
+[data-theme="dark"] .from-purple-50.to-indigo-50 {
+  background: linear-gradient(135deg, rgba(30, 27, 75, 0.9) 0%, rgba(49, 46, 129, 0.9) 100%) !important;
+  border-color: rgba(139, 92, 246, 0.3) !important;
+}
+
+/* All text inside output containers */
+[data-theme="dark"] .p-6.bg-gradient-to-br,
+[data-theme="dark"] .bg-gradient-to-br p,
+[data-theme="dark"] .bg-gradient-to-br span,
+[data-theme="dark"] .bg-gradient-to-br div {
+  color: #c7d2fe !important;
+}
+
+[data-theme="dark"] .p-6.bg-gradient-to-br strong,
+[data-theme="dark"] .p-6.bg-gradient-to-br b,
+[data-theme="dark"] .p-6.bg-gradient-to-br h1,
+[data-theme="dark"] .p-6.bg-gradient-to-br h2,
+[data-theme="dark"] .p-6.bg-gradient-to-br h3 {
+  color: #f5f3ff !important;
+}
+
+/* Statistics cards in dark mode */
+[data-theme="dark"] .from-purple-100,
+[data-theme="dark"] .bg-purple-100 {
+  background: rgba(139, 92, 246, 0.2) !important;
+}
+
+[data-theme="dark"] .from-green-100,
+[data-theme="dark"] .bg-green-100 {
+  background: rgba(16, 185, 129, 0.2) !important;
+}
+
+[data-theme="dark"] .from-blue-100,
+[data-theme="dark"] .bg-blue-100 {
+  background: rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Stats text colors */
+[data-theme="dark"] .text-purple-700 {
+  color: #c4b5fd !important;
+}
+
+[data-theme="dark"] .text-green-700 {
+  color: #6ee7b7 !important;
+}
+
+[data-theme="dark"] .text-purple-900 {
+  color: #e9d5ff !important;
+}
+
+[data-theme="dark"] .text-green-900 {
+  color: #a7f3d0 !important;
+}
+
+/* Original prompt box */
+[data-theme="dark"] .bg-gray-50.rounded-xl,
+[data-theme="dark"] div.bg-gray-50 {
+  background: rgba(30, 27, 75, 0.6) !important;
+  border-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+[data-theme="dark"] .bg-gray-50 p,
+[data-theme="dark"] .bg-gray-50 span {
+  color: #c7d2fe !important;
+}
+
+/* ChatGPT preview style */
+[data-theme="dark"] .bg-gray-800 {
+  background: #1e1b4b !important;
+}
+
+/* Claude preview style */
+[data-theme="dark"] .bg-orange-50 {
+  background: rgba(245, 158, 11, 0.1) !important;
+}
+
+[data-theme="dark"] .bg-orange-50 p,
+[data-theme="dark"] .bg-orange-50 span {
+  color: #fcd34d !important;
+}
+
+/* Raw preview style */
+[data-theme="dark"] .font-mono.bg-gray-100 {
+  background: rgba(30, 27, 75, 0.8) !important;
+  color: #c7d2fe !important;
+}
+
+/* Quality score colors in dark mode */
+[data-theme="dark"] .from-green-100.to-emerald-100 {
+  background: rgba(16, 185, 129, 0.15) !important;
+}
+
+[data-theme="dark"] .from-blue-100.to-indigo-100 {
+  background: rgba(99, 102, 241, 0.15) !important;
+}
+
+[data-theme="dark"] .from-yellow-100.to-amber-100 {
+  background: rgba(245, 158, 11, 0.15) !important;
+}
+
+[data-theme="dark"] .from-red-100.to-rose-100 {
+  background: rgba(244, 63, 94, 0.15) !important;
+}
+
+/* ============================================
    MOBILE RESPONSIVE STYLES
    ============================================ */
 
