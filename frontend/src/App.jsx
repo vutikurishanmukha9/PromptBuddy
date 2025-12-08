@@ -55,19 +55,19 @@ function App() {
 
       {/* Header */}
       <header className="relative bg-white/80 backdrop-blur-lg shadow-lg border-b border-purple-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center space-x-3 animate-slideIn">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-20">
+            <div className="flex items-center space-x-2 sm:space-x-3 animate-slideIn">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform flex-shrink-0">
+                <svg className="w-5 h-5 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent">
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent truncate">
                   PromptBuddy
                 </h1>
-                <p className="text-xs text-gray-500 font-medium">AI-Powered Prompt Optimizer</p>
+                <p className="text-xs text-gray-500 font-medium hidden sm:block">AI-Powered Prompt Optimizer</p>
               </div>
             </div>
             <div className="flex items-center space-x-3 animate-fadeIn">
