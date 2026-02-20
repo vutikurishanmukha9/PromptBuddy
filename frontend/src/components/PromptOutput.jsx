@@ -3,6 +3,91 @@ import { exportPrompt } from '../utils/exporters';
 import { calculateQualityScore } from '../utils/qualityScorer';
 import { savePrompt } from '../utils/storage';
 
+// Simple markdown renderer for AI output
+const renderMarkdown = (text) => {
+  if (!text) return null;
+  const lines = text.split('\n');
+  const elements = [];
+  let inCodeBlock = false;
+  let codeLines = [];
+  let codeLang = '';
+
+  lines.forEach((line, i) => {
+    // Code block toggle
+    if (line.trim().startsWith('```')) {
+      if (inCodeBlock) {
+        elements.push(
+          <pre key={`code-${i}`} className="bg-gray-900 dark:bg-black rounded-lg p-4 my-3 overflow-x-auto">
+            <code className="text-sm text-green-300 font-mono">{codeLines.join('\n')}</code>
+          </pre>
+        );
+        codeLines = [];
+        inCodeBlock = false;
+      } else {
+        inCodeBlock = true;
+        codeLang = line.trim().slice(3);
+      }
+      return;
+    }
+    if (inCodeBlock) { codeLines.push(line); return; }
+
+    // Headers
+    if (line.startsWith('### ')) {
+      elements.push(<h4 key={i} className="text-sm font-bold text-gray-800 dark:text-gray-100 mt-4 mb-1">{line.slice(4)}</h4>);
+      return;
+    }
+    if (line.startsWith('## ')) {
+      elements.push(<h3 key={i} className="text-base font-bold text-gray-900 dark:text-white mt-4 mb-2">{line.slice(3)}</h3>);
+      return;
+    }
+    if (line.startsWith('# ')) {
+      elements.push(<h2 key={i} className="text-lg font-bold text-gray-900 dark:text-white mt-4 mb-2">{line.slice(2)}</h2>);
+      return;
+    }
+
+    // Bullet points
+    if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
+      const indent = line.search(/\S/);
+      const content = line.trim().slice(2);
+      elements.push(
+        <div key={i} className="flex items-start gap-2 my-0.5" style={{ paddingLeft: `${Math.max(0, indent - 0) * 4}px` }}>
+          <span className="text-purple-500 dark:text-purple-400 mt-1.5 text-[6px]">●</span>
+          <span className="text-sm text-gray-700 dark:text-gray-200" dangerouslySetInnerHTML={{ __html: inlineMd(content) }} />
+        </div>
+      );
+      return;
+    }
+
+    // Numbered list
+    const numMatch = line.trim().match(/^(\d+)\.\s(.*)/);
+    if (numMatch) {
+      elements.push(
+        <div key={i} className="flex items-start gap-2 my-0.5">
+          <span className="text-purple-600 dark:text-purple-400 font-semibold text-sm min-w-[20px]">{numMatch[1]}.</span>
+          <span className="text-sm text-gray-700 dark:text-gray-200" dangerouslySetInnerHTML={{ __html: inlineMd(numMatch[2]) }} />
+        </div>
+      );
+      return;
+    }
+
+    // Empty line
+    if (line.trim() === '') { elements.push(<div key={i} className="h-2" />); return; }
+
+    // Normal paragraph
+    elements.push(<p key={i} className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed" dangerouslySetInnerHTML={{ __html: inlineMd(line) }} />);
+  });
+
+  return elements;
+};
+
+// Inline markdown: **bold**, *italic*, `code`
+const inlineMd = (text) => {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-gray-900 dark:text-white">$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code class="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 rounded text-xs font-mono">$1</code>');
+};
+
 const PromptOutput = ({ result, intentOptions }) => {
   const [copied, setCopied] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
@@ -91,7 +176,14 @@ const PromptOutput = ({ result, intentOptions }) => {
               </svg>
               AI-Optimized Prompt
             </h3>
-            <p className="text-green-50 text-sm mt-1">Your prompt has been enhanced</p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-green-50 text-sm">Your prompt has been enhanced</p>
+              {result.ai_model && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white backdrop-blur-sm">
+                  {result.ai_model}
+                </span>
+              )}
+            </div>
           </div>
 
           {qualityScore && (
@@ -266,9 +358,9 @@ const PromptOutput = ({ result, intentOptions }) => {
           {/* Preview - Default */}
           {previewMode === 'default' && (
             <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-slate-800 dark:via-indigo-900/30 dark:to-purple-900/30 rounded-xl p-4 sm:p-5 border-l-4 border-purple-500 shadow-md">
-              <p className="text-sm text-gray-800 dark:text-gray-100 whitespace-pre-wrap leading-relaxed font-medium">
-                {result.optimized_prompt}
-              </p>
+              <div className="prose-sm">
+                {renderMarkdown(result.optimized_prompt)}
+              </div>
             </div>
           )}
 

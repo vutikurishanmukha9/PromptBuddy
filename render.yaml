@@ -3,10 +3,12 @@ services:
     name: promptbuddy-api
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn flask_app:app --bind 0.0.0.0:$PORT
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     rootDir: backend
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.6
-      - key: FLASK_ENV
-        value: production
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false

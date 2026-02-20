@@ -60,8 +60,8 @@ const PresetSelector = ({ onSelectPreset, onClose }) => {
                                     key={key}
                                     onClick={() => setActiveCategory(key)}
                                     className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${activeCategory === key
-                                            ? 'bg-orange-500 text-white shadow-sm'
-                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        ? 'bg-orange-500 text-white shadow-sm'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                         }`}
                                 >
                                     {category.label}
@@ -81,8 +81,8 @@ const PresetSelector = ({ onSelectPreset, onClose }) => {
                                     key={key}
                                     onClick={() => setActiveCategory(key)}
                                     className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors ${activeCategory === key
-                                            ? 'bg-orange-50 text-orange-700 border-r-2 border-orange-500'
-                                            : 'text-gray-600 hover:bg-gray-50'
+                                        ? 'bg-orange-50 text-orange-700 border-r-2 border-orange-500'
+                                        : 'text-gray-600 hover:bg-gray-50'
                                         }`}
                                 >
                                     {category.label}
@@ -117,7 +117,7 @@ const PresetSelector = ({ onSelectPreset, onClose }) => {
 
                         {filteredPresets.length === 0 && (
                             <div className="text-center py-12 text-gray-500">
-                                <div className="text-4xl mb-2">🔍</div>
+                                <div className="text-4xl mb-2"></div>
                                 <p className="text-sm">No presets found</p>
                             </div>
                         )}
