@@ -16,7 +16,6 @@ const PromptGenerator = () => {
   const [showLibrary, setShowLibrary] = useState(false);
   const [showPresets, setShowPresets] = useState(false);
 
-  // Update suggestions when base prompt changes
   useEffect(() => {
     const timer = setTimeout(() => {
       if (basePrompt.trim().length >= 5) {
@@ -28,64 +27,61 @@ const PromptGenerator = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [basePrompt]);
-  // Organized prompt frameworks by category
+
   const promptCategories = {
     essentials: {
       label: 'Essentials',
       types: [
-        { value: 'rtf', label: 'RTF', icon: '', desc: 'Role, Task, Format' },
-        { value: 'race', label: 'RACE', icon: '', desc: 'Role, Action, Context, Expectation' },
-        { value: 'ape', label: 'APE', icon: '', desc: 'Action, Purpose, Expectation' },
-        { value: 'tag', label: 'TAG', icon: '', desc: 'Task, Audience, Goal' },
-        { value: 'era', label: 'ERA', icon: '', desc: 'Expectation, Role, Action' },
+        { value: 'rtf', label: 'RTF', desc: 'Role · Task · Format' },
+        { value: 'race', label: 'RACE', desc: 'Role · Action · Context · Expectation' },
+        { value: 'ape', label: 'APE', desc: 'Action · Purpose · Expectation' },
+        { value: 'tag', label: 'TAG', desc: 'Task · Audience · Goal' },
+        { value: 'era', label: 'ERA', desc: 'Expectation · Role · Action' },
       ]
     },
     structured: {
       label: 'Structured',
       types: [
-        { value: 'risen', label: 'RISEN', icon: '', desc: 'Role, Instructions, Steps, End Goal, Narrowing' },
-        { value: 'coast', label: 'COAST', icon: '', desc: 'Context, Objective, Action, Scenario, Task' },
-        { value: 'trace', label: 'TRACE', icon: '', desc: 'Task, Role, Action, Context, Example' },
-        { value: 'crispe', label: 'CRISPE', icon: '', desc: 'Capacity, Role, Insight, Statement, Personality, Experiment' },
-        { value: 'clear', label: 'CLEAR', icon: '', desc: 'Context, Limits, Expectations, Action, Results' },
+        { value: 'risen', label: 'RISEN', desc: 'Role · Instructions · Steps · End Goal · Narrowing' },
+        { value: 'coast', label: 'COAST', desc: 'Context · Objective · Action · Scenario · Task' },
+        { value: 'trace', label: 'TRACE', desc: 'Task · Role · Action · Context · Example' },
+        { value: 'crispe', label: 'CRISPE', desc: 'Capacity · Role · Insight · Statement · Personality · Experiment' },
+        { value: 'clear', label: 'CLEAR', desc: 'Context · Limits · Expectations · Action · Results' },
       ]
     },
     persuasion: {
-      label: 'Persuasion & Story',
+      label: 'Persuasion',
       types: [
-        { value: 'pastor', label: 'PASTOR', icon: '', desc: 'Problem, Amplify, Story, Transformation, Offer, Response' },
-        { value: 'bab', label: 'BAB', icon: '', desc: 'Before, After, Bridge' },
-        { value: 'aida', label: 'AIDA', icon: '', desc: 'Attention, Interest, Desire, Action' },
-        { value: 'peel', label: 'PEEL', icon: '', desc: 'Point, Evidence, Explain, Link' },
+        { value: 'pastor', label: 'PASTOR', desc: 'Problem · Amplify · Story · Transformation · Offer · Response' },
+        { value: 'bab', label: 'BAB', desc: 'Before · After · Bridge' },
+        { value: 'aida', label: 'AIDA', desc: 'Attention · Interest · Desire · Action' },
+        { value: 'peel', label: 'PEEL', desc: 'Point · Evidence · Explain · Link' },
       ]
     },
     problem_solving: {
       label: 'Problem-Solving',
       types: [
-        { value: 'scqa', label: 'SCQA', icon: '', desc: 'Situation, Complication, Question, Answer' },
-        { value: 'grow', label: 'GROW', icon: '', desc: 'Goal, Reality, Options, Will' },
-        { value: 'star', label: 'STAR', icon: '', desc: 'Situation, Task, Action, Result' },
-        { value: 'par', label: 'PAR', icon: '', desc: 'Problem, Action, Result' },
-        { value: 'care', label: 'CARE', icon: '', desc: 'Context, Action, Result, Example' },
+        { value: 'scqa', label: 'SCQA', desc: 'Situation · Complication · Question · Answer' },
+        { value: 'grow', label: 'GROW', desc: 'Goal · Reality · Options · Will' },
+        { value: 'star', label: 'STAR', desc: 'Situation · Task · Action · Result' },
+        { value: 'par', label: 'PAR', desc: 'Problem · Action · Result' },
+        { value: 'care', label: 'CARE', desc: 'Context · Action · Result · Example' },
       ]
     },
     analysis: {
-      label: 'Analysis & Planning',
+      label: 'Analysis',
       types: [
-        { value: 'smart', label: 'SMART', icon: '', desc: 'Specific, Measurable, Achievable, Relevant, Time-bound' },
-        { value: 'ice', label: 'ICE', icon: '', desc: 'Idea, Context, Execution' },
-        { value: '5w1h', label: '5W1H', icon: '', desc: 'Who, What, When, Where, Why, How' },
+        { value: 'smart', label: 'SMART', desc: 'Specific · Measurable · Achievable · Relevant · Time-bound' },
+        { value: 'ice', label: 'ICE', desc: 'Idea · Context · Execution' },
+        { value: '5w1h', label: '5W1H', desc: 'Who · What · When · Where · Why · How' },
       ]
     },
   };
 
-
-  // Flatten for easy lookup
   const intentOptions = Object.values(promptCategories).flatMap(cat => cat.types);
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
-
     if (!basePrompt.trim()) {
       setError('Please enter a base prompt');
       return;
@@ -99,24 +95,16 @@ const PromptGenerator = () => {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const response = await fetch(`${API_URL}/generate`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          base_prompt: basePrompt,
-          intent: intent
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ base_prompt: basePrompt, intent })
       });
 
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.detail || data.error || 'Failed to generate prompt');
       }
 
       setResult(data);
-
-      // Save to history
       addToHistory({
         basePrompt: data.original_prompt,
         promptType: data.intent,
@@ -129,7 +117,6 @@ const PromptGenerator = () => {
     }
   };
 
-  // Keyboard shortcut: Ctrl+Enter to generate
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.key === 'Enter' && basePrompt.trim()) {
@@ -146,12 +133,10 @@ const PromptGenerator = () => {
     setError('');
   };
 
-  // Load prompt from library
   const handleLoadPrompt = (prompt) => {
     setBasePrompt(prompt.basePrompt);
     if (prompt.promptType) {
       setIntent(prompt.promptType);
-      // Find and set the active category
       for (const [catKey, cat] of Object.entries(promptCategories)) {
         if (cat.types.some(t => t.value === prompt.promptType)) {
           setActiveCategory(catKey);
@@ -161,11 +146,9 @@ const PromptGenerator = () => {
     }
   };
 
-  // Apply preset
   const handleApplyPreset = (preset) => {
     setBasePrompt(preset.basePrompt);
     setIntent(preset.promptType);
-    // Find and set the active category
     for (const [catKey, cat] of Object.entries(promptCategories)) {
       if (cat.types.some(t => t.value === preset.promptType)) {
         setActiveCategory(catKey);
@@ -175,20 +158,20 @@ const PromptGenerator = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="card hover-lift p-8 animate-fadeIn">
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Generate Optimized Prompts
-            </h2>
-            <div className="flex items-center gap-2">
+    <div className="generator-card">
+      <div className="card animate-fadeIn">
+        {/* Header */}
+        <div className="generator-header">
+          <div className="generator-header__top">
+            <h2 className="generator-header__title">Generate Optimized Prompts</h2>
+            <div className="generator-header__actions">
               <button
                 type="button"
                 onClick={() => setShowLibrary(true)}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+                className="btn-secondary"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.5rem 0.875rem', fontSize: '0.8rem' }}
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" style={{ flexShrink: 0 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                 </svg>
                 Library
@@ -196,28 +179,29 @@ const PromptGenerator = () => {
               <button
                 type="button"
                 onClick={() => setShowPresets(true)}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-orange-600 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
+                className="btn-secondary"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.5rem 0.875rem', fontSize: '0.8rem' }}
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" style={{ flexShrink: 0 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
                 </svg>
                 Presets
               </button>
             </div>
           </div>
-          <p className="text-gray-600 text-lg">
-            Enter your base prompt and select the intended use case to get an <span className="font-semibold text-purple-600">AI-optimized</span>, refined prompt.
+          <p className="generator-header__desc">
+            Enter your base prompt and select a framework to get an <strong style={{ color: 'rgb(var(--color-primary))' }}>AI-optimized</strong> prompt.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Base Prompt Input */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {/* Textarea */}
           <div>
             <label
               htmlFor="base-prompt"
-              className="block text-sm font-semibold text-gray-700 mb-3 flex items-center"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.5rem' }}
             >
-              <svg className="w-4 h-4 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" style={{ color: 'rgb(var(--color-primary))' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
               Base Prompt
@@ -226,24 +210,23 @@ const PromptGenerator = () => {
               id="base-prompt"
               value={basePrompt}
               onChange={(e) => setBasePrompt(e.target.value)}
-              placeholder="e.g., 'Create a website for a coffee shop' or 'Design a logo for a tech startup'..."
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 resize-none hover:border-gray-300 transition-all"
+              placeholder="e.g., 'Create a website for a coffee shop' or 'Help me debug this React component'..."
+              className="prompt-textarea"
               rows="4"
               required
             />
 
-            {/* Smart Suggestions */}
+            {/* Suggestions */}
             {suggestions.length > 0 && (
-              <div className="mt-3 animate-fadeIn">
-                <p className="text-xs text-gray-500 mb-2">Suggested prompt types based on your input:</p>
-                <div className="flex flex-wrap gap-2">
+              <div className="animate-fadeIn" style={{ marginTop: '0.75rem' }}>
+                <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Suggested frameworks:</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
                   {suggestions.map((suggestion, idx) => (
                     <button
                       key={idx}
                       type="button"
                       onClick={() => {
                         setIntent(suggestion.type);
-                        // Find the category for this type and set it active
                         for (const [catKey, cat] of Object.entries(promptCategories)) {
                           if (cat.types.some(t => t.value === suggestion.type)) {
                             setActiveCategory(catKey);
@@ -254,7 +237,7 @@ const PromptGenerator = () => {
                       className={`suggestion-chip ${intent === suggestion.type ? 'ring-2 ring-purple-500' : ''}`}
                       title={suggestion.reason}
                     >
-                      {intentOptions.find(o => o.value === suggestion.type)?.icon} {intentOptions.find(o => o.value === suggestion.type)?.label}
+                      {intentOptions.find(o => o.value === suggestion.type)?.label}
                     </button>
                   ))}
                 </div>
@@ -262,44 +245,37 @@ const PromptGenerator = () => {
             )}
           </div>
 
-          {/* Prompt Type Selection */}
+          {/* Framework Selection */}
           <div>
             <label
-              htmlFor="intent"
-              className="block text-sm font-semibold text-gray-700 mb-3 flex items-center"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.5rem' }}
             >
-              <svg className="w-4 h-4 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" style={{ color: 'rgb(var(--color-primary))' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
               </svg>
-              Prompt Structure Type
+              Prompt Framework
             </label>
 
             {/* Category Tabs */}
-            <div className="flex flex-wrap gap-2 mb-4 w-full">
+            <div className="category-tabs">
               {Object.entries(promptCategories).map(([key, category]) => (
                 <button
                   key={key}
                   type="button"
                   onClick={() => setActiveCategory(key)}
-                  className={`flex-1 min-w-[100px] px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeCategory === key
-                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
+                  className={`category-tab ${activeCategory === key ? 'category-tab--active' : ''}`}
                 >
                   {category.label}
                 </button>
               ))}
             </div>
 
-            {/* Prompt Types for Active Category */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+            {/* Framework Cards */}
+            <div className="framework-grid">
               {promptCategories[activeCategory].types.map((option) => (
                 <label
                   key={option.value}
-                  className={`relative flex flex-col p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 ${intent === option.value
-                    ? 'border-purple-500 bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-700 shadow-md'
-                    : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50/30'
-                    }`}
+                  className={`framework-card ${intent === option.value ? 'framework-card--active' : ''}`}
                 >
                   <input
                     type="radio"
@@ -309,73 +285,60 @@ const PromptGenerator = () => {
                     onChange={(e) => setIntent(e.target.value)}
                     className="sr-only"
                   />
-                  <div className="flex items-center mb-1">
-                    <span className="text-xl mr-2">{option.icon}</span>
-                    <span className="text-sm font-semibold">{option.label}</span>
-                  </div>
-                  <span className="text-xs text-gray-500">{option.desc}</span>
+                  <span className="framework-card__label">{option.label}</span>
+                  <span className="framework-card__desc">{option.desc}</span>
                 </label>
               ))}
             </div>
 
-            {/* Selected Type Display */}
-            <div className="mt-3 px-3 py-2 bg-purple-50 rounded-lg border border-purple-200">
-              <span className="text-xs text-purple-600 font-medium">
-                Selected: {intentOptions.find(o => o.value === intent)?.icon} {intentOptions.find(o => o.value === intent)?.label}
-              </span>
+            {/* Selected Indicator */}
+            <div className="selected-indicator">
+              Selected: {intentOptions.find(o => o.value === intent)?.label} — {intentOptions.find(o => o.value === intent)?.desc}
             </div>
           </div>
 
-          {/* Error Message */}
+          {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-800">{error}</p>
-                </div>
-              </div>
+            <div className="error-box">
+              <svg className="w-5 h-5 error-box__icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <span className="error-box__text">{error}</span>
             </div>
           )}
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="action-row">
             <button
               type="submit"
               disabled={isLoading || !basePrompt.trim()}
-              className={`flex-1 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-semibold rounded-xl text-white transition-all duration-200 btn-glow ${isLoading || !basePrompt.trim()
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transform hover:scale-105'
-                }`}
+              className="btn-primary"
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0.75rem 1.5rem', fontSize: '0.9rem', flex: 1 }}
             >
               {isLoading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg className="animate-spin" style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path style={{ opacity: 0.75 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   AI is optimizing...
                 </>
               ) : (
                 <>
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                   Optimize with AI
                 </>
               )}
             </button>
-
             <button
               type="button"
               onClick={handleClear}
-              className="flex-shrink-0 inline-flex items-center justify-center px-6 py-3 border-2 border-gray-300 text-base font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 transform hover:scale-105"
+              className="btn-secondary"
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0.75rem 1.5rem', fontSize: '0.9rem' }}
             >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
               Clear
@@ -384,13 +347,10 @@ const PromptGenerator = () => {
         </form>
       </div>
 
-      {/* Output Section */}
+      {/* Output */}
       {result && (
-        <div className="mt-8">
-          <PromptOutput
-            result={result}
-            intentOptions={intentOptions}
-          />
+        <div style={{ marginTop: '2rem' }}>
+          <PromptOutput result={result} intentOptions={intentOptions} />
         </div>
       )}
 
@@ -400,7 +360,6 @@ const PromptGenerator = () => {
         onClose={() => setShowLibrary(false)}
         onLoadPrompt={handleLoadPrompt}
       />
-
       {showPresets && (
         <PresetSelector
           onSelectPreset={handleApplyPreset}

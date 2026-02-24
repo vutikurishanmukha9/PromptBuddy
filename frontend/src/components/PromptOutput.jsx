@@ -10,71 +10,61 @@ const renderMarkdown = (text) => {
   const elements = [];
   let inCodeBlock = false;
   let codeLines = [];
-  let codeLang = '';
 
   lines.forEach((line, i) => {
-    // Code block toggle
     if (line.trim().startsWith('```')) {
       if (inCodeBlock) {
         elements.push(
-          <pre key={`code-${i}`} className="bg-gray-900 dark:bg-black rounded-lg p-4 my-3 overflow-x-auto">
-            <code className="text-sm text-green-300 font-mono">{codeLines.join('\n')}</code>
-          </pre>
+          <pre key={`code-${i}`} className="prose-sm"><code>{codeLines.join('\n')}</code></pre>
         );
         codeLines = [];
         inCodeBlock = false;
       } else {
         inCodeBlock = true;
-        codeLang = line.trim().slice(3);
       }
       return;
     }
     if (inCodeBlock) { codeLines.push(line); return; }
 
-    // Headers
     if (line.startsWith('### ')) {
-      elements.push(<h4 key={i} className="text-sm font-bold text-gray-800 dark:text-gray-100 mt-4 mb-1">{line.slice(4)}</h4>);
+      elements.push(<h4 key={i} className="prose-sm">{line.slice(4)}</h4>);
       return;
     }
     if (line.startsWith('## ')) {
-      elements.push(<h3 key={i} className="text-base font-bold text-gray-900 dark:text-white mt-4 mb-2">{line.slice(3)}</h3>);
+      elements.push(<h3 key={i} className="prose-sm">{line.slice(3)}</h3>);
       return;
     }
     if (line.startsWith('# ')) {
-      elements.push(<h2 key={i} className="text-lg font-bold text-gray-900 dark:text-white mt-4 mb-2">{line.slice(2)}</h2>);
+      elements.push(<h2 key={i} className="prose-sm">{line.slice(2)}</h2>);
       return;
     }
 
-    // Bullet points
     if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
       const indent = line.search(/\S/);
       const content = line.trim().slice(2);
       elements.push(
-        <div key={i} className="flex items-start gap-2 my-0.5" style={{ paddingLeft: `${Math.max(0, indent - 0) * 4}px` }}>
-          <span className="text-purple-500 dark:text-purple-400 mt-1.5 text-[6px]">●</span>
-          <span className="text-sm text-gray-700 dark:text-gray-200" dangerouslySetInnerHTML={{ __html: inlineMd(content) }} />
+        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', paddingLeft: `${Math.max(0, indent) * 4}px`, margin: '0.125rem 0' }}>
+          <span style={{ color: 'rgb(var(--color-accent))', marginTop: '0.375rem', fontSize: '0.375rem' }}>●</span>
+          <span className="prose-sm" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }} dangerouslySetInnerHTML={{ __html: inlineMd(content) }} />
         </div>
       );
       return;
     }
 
-    // Numbered list
     const numMatch = line.trim().match(/^(\d+)\.\s(.*)/);
     if (numMatch) {
       elements.push(
-        <div key={i} className="flex items-start gap-2 my-0.5">
-          <span className="text-purple-600 dark:text-purple-400 font-semibold text-sm min-w-[20px]">{numMatch[1]}.</span>
-          <span className="text-sm text-gray-700 dark:text-gray-200" dangerouslySetInnerHTML={{ __html: inlineMd(numMatch[2]) }} />
+        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', margin: '0.125rem 0' }}>
+          <span style={{ color: 'rgb(var(--color-primary))', fontWeight: 600, fontSize: '0.8rem', minWidth: '1.25rem' }}>{numMatch[1]}.</span>
+          <span className="prose-sm" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }} dangerouslySetInnerHTML={{ __html: inlineMd(numMatch[2]) }} />
         </div>
       );
       return;
     }
 
-    // Empty line
-    if (line.trim() === '') { elements.push(<div key={i} className="h-2" />); return; }
+    if (line.trim() === '') { elements.push(<div key={i} style={{ height: '0.5rem' }} />); return; }
 
-    // Normal paragraph
-    elements.push(<p key={i} className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed" dangerouslySetInnerHTML={{ __html: inlineMd(line) }} />);
+    elements.push(<p key={i} className="prose-sm" dangerouslySetInnerHTML={{ __html: inlineMd(line) }} />);
   });
 
   return elements;
@@ -83,9 +73,9 @@ const renderMarkdown = (text) => {
 // Inline markdown: **bold**, *italic*, `code`
 const inlineMd = (text) => {
   return text
-    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-gray-900 dark:text-white">$1</strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/`(.+?)`/g, '<code class="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 rounded text-xs font-mono">$1</code>');
+    .replace(/`(.+?)`/g, '<code>$1</code>');
 };
 
 const PromptOutput = ({ result, intentOptions }) => {
@@ -97,10 +87,10 @@ const PromptOutput = ({ result, intentOptions }) => {
   const [previewMode, setPreviewMode] = useState('default');
 
   const previewModes = [
-    { value: 'default', label: 'Default', icon: '' },
-    { value: 'chatgpt', label: 'ChatGPT', icon: '' },
-    { value: 'claude', label: 'Claude', icon: '' },
-    { value: 'raw', label: 'Raw', icon: '' },
+    { value: 'default', label: 'Default' },
+    { value: 'chatgpt', label: 'ChatGPT' },
+    { value: 'claude', label: 'Claude' },
+    { value: 'raw', label: 'Raw' },
   ];
 
   useEffect(() => {
@@ -141,294 +131,247 @@ const PromptOutput = ({ result, intentOptions }) => {
     setShowExportMenu(false);
   };
 
-  const getIntentLabel = (intentValue) => {
-    const option = intentOptions.find(opt => opt.value === intentValue);
-    return option ? option.label : intentValue;
-  };
-
-  const getIntentIcon = (intentValue) => {
-    const option = intentOptions.find(opt => opt.value === intentValue);
-    return option ? option.icon : '';
-  };
+  const getIntentLabel = (val) => intentOptions.find(o => o.value === val)?.label || val;
 
   const getScoreColor = (score) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-blue-600';
-    if (score >= 40) return 'text-yellow-600';
-    return 'text-red-600';
-  };
-
-  const getScoreBgColor = (score) => {
-    if (score >= 80) return 'from-green-100 to-emerald-100 border-green-200';
-    if (score >= 60) return 'from-blue-100 to-indigo-100 border-blue-200';
-    if (score >= 40) return 'from-yellow-100 to-amber-100 border-yellow-200';
-    return 'from-red-100 to-rose-100 border-red-200';
+    if (score >= 80) return 'rgb(var(--color-success))';
+    if (score >= 60) return 'rgb(var(--color-primary))';
+    if (score >= 40) return 'rgb(var(--color-warning))';
+    return 'rgb(var(--color-danger))';
   };
 
   return (
-    <div className="card hover-lift overflow-hidden animate-fadeIn">
-      <div className="bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 px-4 sm:px-8 py-4 sm:py-5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <h3 className="text-xl sm:text-2xl font-bold text-white flex items-center">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="card animate-fadeIn" style={{ overflow: 'hidden' }}>
+      {/* Green Header */}
+      <div className="output-header">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <div style={{ flex: 1 }}>
+            <h3 className="output-header__title">
+              <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               AI-Optimized Prompt
             </h3>
-            <div className="flex items-center gap-2 mt-1">
-              <p className="text-green-50 text-sm">Your prompt has been enhanced</p>
+            <div className="output-header__meta">
+              <span className="output-header__subtitle">Your prompt has been enhanced</span>
               {result.ai_model && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white backdrop-blur-sm">
-                  {result.ai_model}
-                </span>
+                <span className="output-header__model">{result.ai_model}</span>
               )}
             </div>
           </div>
 
           {qualityScore && (
             <div
-              className="flex items-center gap-2 bg-white/20 rounded-lg px-3 sm:px-4 py-2 cursor-pointer hover:bg-white/30 transition-colors"
+              className="quality-badge"
               onClick={() => setShowQualityDetails(!showQualityDetails)}
               title="Click for details"
             >
-              <span className="text-white text-sm">Quality:</span>
-              <span className={`text-xl sm:text-2xl font-bold ${qualityScore.overall >= 70 ? 'text-white' : 'text-yellow-200'}`}>
+              <span style={{ color: 'white', fontSize: '0.8rem' }}>Quality:</span>
+              <span style={{ fontSize: '1.25rem', fontWeight: 800, color: qualityScore.overall >= 70 ? 'white' : '#fde68a' }}>
                 {qualityScore.grade}
               </span>
-              <span className="text-white/80 text-sm">({qualityScore.overall}%)</span>
+              <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem' }}>({qualityScore.overall}%)</span>
             </div>
           )}
         </div>
       </div>
 
-      <div className="p-4 sm:p-8">
-        {/* Quality Score Details */}
+      <div className="output-body">
+        {/* Quality Breakdown */}
         {showQualityDetails && qualityScore && (
-          <div className="mb-6 p-4 bg-gradient-to-r from-gray-50 to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-xl border border-gray-200 dark:border-purple-500/30 animate-fadeIn">
-            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Quality Score Breakdown</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+          <div className="animate-fadeIn" style={{ marginBottom: '1.25rem' }}>
+            <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>Quality Score Breakdown</h4>
+            <div className="quality-breakdown">
               {Object.entries(qualityScore.breakdown).map(([key, data]) => (
-                <div key={key} className={`p-2 sm:p-3 rounded-lg bg-gradient-to-br ${getScoreBgColor(data.score)} dark:from-slate-700 dark:to-slate-800 border dark:border-purple-500/20`}>
-                  <div className="text-xs text-gray-600 dark:text-gray-300 capitalize font-medium">{key}</div>
-                  <div className={`text-base sm:text-lg font-bold ${getScoreColor(data.score)} dark:text-gray-100`}>{data.score}%</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">{data.weight}</div>
+                <div key={key} className="quality-breakdown__item">
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'capitalize' }}>{key}</div>
+                  <div style={{ fontSize: '1.125rem', fontWeight: 700, color: getScoreColor(data.score) }}>{data.score}%</div>
+                  <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)' }}>{data.weight}</div>
                 </div>
               ))}
             </div>
-            <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{qualityScore.feedback}</p>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>{qualityScore.feedback}</p>
           </div>
         )}
 
         {/* Intent Badge */}
-        <div className="mb-4 sm:mb-6 flex flex-wrap gap-2 sm:gap-3">
-          <span className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/50 dark:to-indigo-900/50 text-purple-700 dark:text-purple-200 border border-purple-200 dark:border-purple-500/30 shadow-sm">
-            <span className="mr-1 sm:mr-2">{getIntentIcon(result.intent)}</span>
-            {getIntentLabel(result.intent)}
-          </span>
+        <div style={{ marginBottom: '1rem' }}>
+          <span className="intent-badge">{getIntentLabel(result.intent)}</span>
         </div>
 
         {/* Original Prompt */}
-        <div className="mb-4 sm:mb-6">
-          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2 sm:mb-3 flex items-center">
-            <svg className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div style={{ marginBottom: '1rem' }}>
+          <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+            <svg style={{ width: '0.875rem', height: '0.875rem', color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
             </svg>
-            Your Input:
+            Your Input
           </h4>
-          <div className="bg-gradient-to-r from-gray-50 to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-xl p-3 sm:p-4 border-l-4 border-gray-400 dark:border-purple-500 shadow-sm">
-            <p className="text-sm text-gray-700 dark:text-gray-200 italic font-medium">"{result.original_prompt}"</p>
+          <div className="original-prompt">
+            <p className="original-prompt__text">"{result.original_prompt}"</p>
           </div>
         </div>
 
         {/* Optimized Prompt */}
         <div>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 flex items-center">
-              <svg className="w-4 h-4 mr-2 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              AI-Optimized Prompt:
-            </h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                <svg style={{ width: '0.875rem', height: '0.875rem', color: 'rgb(var(--color-primary))' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                AI-Optimized Prompt
+              </h4>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <button
-                onClick={handleSave}
-                className={`inline-flex items-center px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 ${saved
-                  ? 'text-white bg-gradient-to-r from-green-500 to-emerald-500'
-                  : 'text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600'
-                  }`}
-                title="Save to library"
-              >
-                {saved ? (
-                  <>
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Saved!
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
-                    Save
-                  </>
-                )}
-              </button>
-
-              {/* Export Dropdown */}
-              <div className="export-dropdown relative">
+              {/* Action Buttons */}
+              <div className="output-actions">
                 <button
-                  onClick={() => setShowExportMenu(!showExportMenu)}
-                  className="inline-flex items-center px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-lg transition-all duration-200"
-                  title="Export prompt"
+                  onClick={handleSave}
+                  className={`output-actions__btn ${saved ? 'output-actions__btn--success' : ''}`}
                 >
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  <svg style={{ width: '0.875rem', height: '0.875rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {saved ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    )}
                   </svg>
-                  Export
-                  <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
+                  {saved ? 'Saved!' : 'Save'}
                 </button>
 
-                {showExportMenu && (
-                  <div className="export-menu animate-fadeIn absolute right-0 mt-2 w-40 bg-white dark:bg-slate-800 rounded-lg shadow-lg border dark:border-slate-700 py-1 z-10">
-                    <button onClick={() => handleExport('markdown')} className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                      Markdown
-                    </button>
-                    <button onClick={() => handleExport('json')} className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
-                      JSON
-                    </button>
-                    <button onClick={() => handleExport('text')} className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
-                      Text
-                    </button>
-                  </div>
-                )}
-              </div>
+                {/* Export */}
+                <div className="export-dropdown">
+                  <button
+                    onClick={() => setShowExportMenu(!showExportMenu)}
+                    className="output-actions__btn"
+                  >
+                    <svg style={{ width: '0.875rem', height: '0.875rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Export
+                    <svg style={{ width: '0.625rem', height: '0.625rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
 
-              <button
-                onClick={copyToClipboard}
-                className={`inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 ${copied
-                  ? 'text-white bg-gradient-to-r from-green-500 to-emerald-500 shadow-md'
-                  : 'text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600'
-                  }`}
-              >
-                {copied ? (
-                  <>
-                    <svg className="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {showExportMenu && (
+                    <div className="export-menu animate-fadeIn">
+                      <button onClick={() => handleExport('markdown')}>
+                        <svg style={{ width: '0.875rem', height: '0.875rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        Markdown
+                      </button>
+                      <button onClick={() => handleExport('json')}>
+                        <svg style={{ width: '0.875rem', height: '0.875rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+                        JSON
+                      </button>
+                      <button onClick={() => handleExport('text')}>
+                        <svg style={{ width: '0.875rem', height: '0.875rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                        Text
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={copyToClipboard}
+                  className={`output-actions__btn ${copied ? 'output-actions__btn--success' : ''}`}
+                >
+                  <svg style={{ width: '0.875rem', height: '0.875rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {copied ? (
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    ) : (
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    Copy
-                  </>
-                )}
-              </button>
+                    )}
+                  </svg>
+                  {copied ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+            </div>
+
+            {/* Preview Tabs */}
+            <div className="preview-tabs">
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginRight: '0.25rem' }}>Preview:</span>
+              {previewModes.map((mode) => (
+                <button
+                  key={mode.value}
+                  onClick={() => setPreviewMode(mode.value)}
+                  className={`preview-tab ${previewMode === mode.value ? 'preview-tab--active' : ''}`}
+                >
+                  {mode.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Preview Mode Selector */}
-          <div className="flex items-center gap-2 mb-3 flex-wrap">
-            <span className="text-xs text-gray-500 dark:text-gray-400">Preview:</span>
-            {previewModes.map((mode) => (
-              <button
-                key={mode.value}
-                onClick={() => setPreviewMode(mode.value)}
-                className={`px-2 sm:px-3 py-1 text-xs rounded-full transition-all ${previewMode === mode.value
-                  ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-200 font-medium'
-                  : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600'
-                  }`}
-              >
-                {mode.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Preview - Default */}
+          {/* Preview Content */}
           {previewMode === 'default' && (
-            <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-slate-800 dark:via-indigo-900/30 dark:to-purple-900/30 rounded-xl p-4 sm:p-5 border-l-4 border-purple-500 shadow-md">
+            <div className="output-preview output-preview--default">
               <div className="prose-sm">
                 {renderMarkdown(result.optimized_prompt)}
               </div>
             </div>
           )}
 
-          {/* Preview - ChatGPT Style */}
           {previewMode === 'chatgpt' && (
-            <div className="bg-gray-900 rounded-xl p-4 sm:p-5 shadow-md">
-              <div className="flex items-start gap-3">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-xs sm:text-sm font-bold">U</span>
+            <div className="output-preview output-preview--chatgpt">
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                <div style={{ width: '1.75rem', height: '1.75rem', background: '#19c37d', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <span style={{ color: 'white', fontSize: '0.7rem', fontWeight: 700 }}>U</span>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm text-gray-100 whitespace-pre-wrap leading-relaxed">
-                    {result.optimized_prompt}
-                  </p>
-                </div>
+                <p style={{ fontSize: '0.8rem', color: '#ececf1', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                  {result.optimized_prompt}
+                </p>
               </div>
             </div>
           )}
 
-          {/* Preview - Claude Style */}
           {previewMode === 'claude' && (
-            <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4 sm:p-5 shadow-md border border-orange-200 dark:border-orange-500/30">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-5 h-5 sm:w-6 sm:h-6 bg-orange-500 rounded-full"></div>
-                <span className="text-sm font-semibold text-orange-700 dark:text-orange-300">Human</span>
+            <div className="output-preview output-preview--claude">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <div style={{ width: '1.5rem', height: '1.5rem', background: '#d97706', borderRadius: '50%' }}></div>
+                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Human</span>
               </div>
-              <p className="text-sm text-gray-800 dark:text-orange-100 whitespace-pre-wrap leading-relaxed">
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
                 {result.optimized_prompt}
               </p>
             </div>
           )}
 
-          {/* Preview - Raw */}
           {previewMode === 'raw' && (
-            <div className="bg-gray-100 dark:bg-slate-800 rounded-xl p-4 font-mono overflow-x-auto">
-              <pre className="text-xs text-gray-700 dark:text-gray-200 whitespace-pre-wrap break-words">
+            <div className="output-preview output-preview--raw">
+              <pre style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0 }}>
                 {result.optimized_prompt}
               </pre>
             </div>
           )}
         </div>
 
-        {/* Statistics */}
-        <div className="mt-6 sm:mt-8 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
-          <div className="bg-gradient-to-br from-gray-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 rounded-lg sm:rounded-xl p-2 sm:p-4 border border-gray-200 dark:border-purple-500/30 hover:shadow-md transition-shadow overflow-hidden">
-            <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-300 uppercase tracking-wide font-semibold mb-1 truncate">Original</div>
-            <div className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white truncate">{result.original_prompt.length}</div>
-            <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 truncate">chars</div>
+        {/* Stats */}
+        <div className="stats-grid" style={{ marginTop: '1.5rem' }}>
+          <div className="stat-card">
+            <div className="stat-card__label">Original</div>
+            <div className="stat-card__value">{result.original_prompt.length}</div>
+            <div className="stat-card__unit">chars</div>
           </div>
-          <div className="bg-gradient-to-br from-purple-50 to-indigo-100 dark:from-purple-900/50 dark:to-indigo-900/50 rounded-lg sm:rounded-xl p-2 sm:p-4 border border-purple-200 dark:border-purple-500/30 hover:shadow-md transition-shadow overflow-hidden">
-            <div className="text-[10px] sm:text-xs text-purple-600 dark:text-purple-300 uppercase tracking-wide font-semibold mb-1 truncate">Optimized</div>
-            <div className="text-lg sm:text-2xl font-bold text-purple-900 dark:text-purple-100 truncate">{result.optimized_prompt.length}</div>
-            <div className="text-[10px] sm:text-xs text-purple-600 dark:text-purple-300 truncate">chars</div>
+          <div className="stat-card" style={{ borderColor: 'rgba(var(--color-primary), 0.2)' }}>
+            <div className="stat-card__label" style={{ color: 'rgb(var(--color-primary))' }}>Optimized</div>
+            <div className="stat-card__value" style={{ color: 'rgb(var(--color-primary))' }}>{result.optimized_prompt.length}</div>
+            <div className="stat-card__unit" style={{ color: 'rgb(var(--color-primary))' }}>chars</div>
           </div>
-          <div className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-emerald-900/50 dark:to-green-900/50 rounded-lg sm:rounded-xl p-2 sm:p-4 border border-green-200 dark:border-green-500/30 hover:shadow-md transition-shadow overflow-hidden">
-            <div className="text-[10px] sm:text-xs text-green-600 dark:text-green-300 uppercase tracking-wide font-semibold mb-1 truncate">Expand</div>
-            <div className="text-lg sm:text-2xl font-bold text-green-700 dark:text-green-100 truncate">
+          <div className="stat-card" style={{ borderColor: 'rgba(var(--color-success), 0.2)' }}>
+            <div className="stat-card__label" style={{ color: 'rgb(var(--color-success))' }}>Expand</div>
+            <div className="stat-card__value" style={{ color: 'rgb(var(--color-success))' }}>
               {Math.round((result.optimized_prompt.length / result.original_prompt.length) * 100)}%
             </div>
-            <div className="text-[10px] sm:text-xs text-green-600 dark:text-green-300 truncate">growth</div>
+            <div className="stat-card__unit" style={{ color: 'rgb(var(--color-success))' }}>growth</div>
           </div>
           {qualityScore && (
-            <div className={`bg-gradient-to-br ${getScoreBgColor(qualityScore.overall)} dark:from-blue-900/50 dark:to-indigo-900/50 rounded-lg sm:rounded-xl p-2 sm:p-4 border dark:border-blue-500/30 hover:shadow-md transition-shadow overflow-hidden`}>
-              <div className="text-[10px] sm:text-xs uppercase tracking-wide font-semibold mb-1 dark:text-blue-300 truncate">Quality</div>
-              <div className={`text-lg sm:text-2xl font-bold ${getScoreColor(qualityScore.overall)} dark:text-blue-100 truncate`}>
+            <div className="stat-card">
+              <div className="stat-card__label">Quality</div>
+              <div className="stat-card__value" style={{ color: getScoreColor(qualityScore.overall) }}>
                 {qualityScore.grade}
               </div>
-              <div className="text-[10px] sm:text-xs dark:text-blue-300 truncate">{qualityScore.overall}/100</div>
+              <div className="stat-card__unit">{qualityScore.overall}/100</div>
             </div>
           )}
         </div>
