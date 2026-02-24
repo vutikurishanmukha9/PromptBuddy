@@ -122,7 +122,7 @@ export const getSettings = () => {
         const data = localStorage.getItem(STORAGE_KEYS.SETTINGS);
         return data ? JSON.parse(data) : {
             autoSaveHistory: true,
-            defaultPromptType: 'instruction',
+            defaultPromptType: 'rtf',
             showQualityScore: true,
             previewMode: 'default',
         };

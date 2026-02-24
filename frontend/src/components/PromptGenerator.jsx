@@ -7,11 +7,11 @@ import { addToHistory } from '../utils/storage';
 
 const PromptGenerator = () => {
   const [basePrompt, setBasePrompt] = useState('');
-  const [intent, setIntent] = useState('instruction');
+  const [intent, setIntent] = useState('rtf');
   const [result, setResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [activeCategory, setActiveCategory] = useState('basic');
+  const [activeCategory, setActiveCategory] = useState('essentials');
   const [suggestions, setSuggestions] = useState([]);
   const [showLibrary, setShowLibrary] = useState(false);
   const [showPresets, setShowPresets] = useState(false);
@@ -28,64 +28,55 @@ const PromptGenerator = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [basePrompt]);
-  // Organized prompt types by category
+  // Organized prompt frameworks by category
   const promptCategories = {
-    basic: {
-      label: 'Basic',
+    essentials: {
+      label: 'Essentials',
       types: [
-        { value: 'instruction', label: 'Instruction', icon: '', desc: 'Direct, actionable instructions' },
-        { value: 'contextual', label: 'Contextual', icon: '', desc: 'Context-enriched prompts' },
-        { value: 'role_based', label: 'Role-Based', icon: '', desc: 'Expert persona approach' },
-      ]
-    },
-    shots: {
-      label: 'Shot-Based',
-      types: [
-        { value: 'zero_shot', label: 'Zero-Shot', icon: '', desc: 'No examples, pure reasoning' },
-        { value: 'one_shot', label: 'One-Shot', icon: '', desc: 'Single example pattern' },
-        { value: 'few_shot', label: 'Few-Shot', icon: '', desc: 'Multiple examples for learning' },
-      ]
-    },
-    reasoning: {
-      label: 'Reasoning',
-      types: [
-        { value: 'chain_of_thought', label: 'Chain-of-Thought', icon: '', desc: 'Step-by-step reasoning' },
-        { value: 'self_consistency', label: 'Self-Consistency', icon: '', desc: 'Multiple reasoning paths' },
-        { value: 'socratic', label: 'Socratic', icon: '', desc: 'Guided questioning method' },
+        { value: 'rtf', label: 'RTF', icon: '', desc: 'Role, Task, Format' },
+        { value: 'race', label: 'RACE', icon: '', desc: 'Role, Action, Context, Expectation' },
+        { value: 'ape', label: 'APE', icon: '', desc: 'Action, Purpose, Expectation' },
+        { value: 'tag', label: 'TAG', icon: '', desc: 'Task, Audience, Goal' },
+        { value: 'era', label: 'ERA', icon: '', desc: 'Expectation, Role, Action' },
       ]
     },
     structured: {
       label: 'Structured',
       types: [
-        { value: 'template', label: 'Template', icon: '', desc: 'Schema-based format' },
-        { value: 'goal_oriented', label: 'Goal-Oriented', icon: '', desc: 'Objective-focused' },
-        { value: 'constraint_based', label: 'Constraint-Based', icon: '', desc: 'Within boundaries' },
+        { value: 'risen', label: 'RISEN', icon: '', desc: 'Role, Instructions, Steps, End Goal, Narrowing' },
+        { value: 'coast', label: 'COAST', icon: '', desc: 'Context, Objective, Action, Scenario, Task' },
+        { value: 'trace', label: 'TRACE', icon: '', desc: 'Task, Role, Action, Context, Example' },
+        { value: 'crispe', label: 'CRISPE', icon: '', desc: 'Capacity, Role, Insight, Statement, Personality, Experiment' },
+        { value: 'clear', label: 'CLEAR', icon: '', desc: 'Context, Limits, Expectations, Action, Results' },
       ]
     },
-    advanced: {
-      label: 'Advanced',
+    persuasion: {
+      label: 'Persuasion & Story',
       types: [
-        { value: 'meta_prompt', label: 'Meta-Prompt', icon: '', desc: 'Prompts about prompts' },
-        { value: 'refinement', label: 'Refinement', icon: '', desc: 'Iterative improvement' },
-        { value: 'evaluation', label: 'Evaluation', icon: '', desc: 'Judge and score content' },
+        { value: 'pastor', label: 'PASTOR', icon: '', desc: 'Problem, Amplify, Story, Transformation, Offer, Response' },
+        { value: 'bab', label: 'BAB', icon: '', desc: 'Before, After, Bridge' },
+        { value: 'aida', label: 'AIDA', icon: '', desc: 'Attention, Interest, Desire, Action' },
+        { value: 'peel', label: 'PEEL', icon: '', desc: 'Point, Evidence, Explain, Link' },
       ]
     },
-    collaborative: {
-      label: 'Collaborative',
+    problem_solving: {
+      label: 'Problem-Solving',
       types: [
-        { value: 'multi_agent', label: 'Multi-Agent', icon: '', desc: 'AI team roles' },
-        { value: 'delegation', label: 'Delegation', icon: '', desc: 'Subtask breakdown' },
-        { value: 'planning', label: 'Planning', icon: '', desc: 'Strategy-first structure' },
+        { value: 'scqa', label: 'SCQA', icon: '', desc: 'Situation, Complication, Question, Answer' },
+        { value: 'grow', label: 'GROW', icon: '', desc: 'Goal, Reality, Options, Will' },
+        { value: 'star', label: 'STAR', icon: '', desc: 'Situation, Task, Action, Result' },
+        { value: 'par', label: 'PAR', icon: '', desc: 'Problem, Action, Result' },
+        { value: 'care', label: 'CARE', icon: '', desc: 'Context, Action, Result, Example' },
       ]
     },
-    creative: {
-      label: 'Creative',
+    analysis: {
+      label: 'Analysis & Planning',
       types: [
-        { value: 'creative', label: 'Creative', icon: '', desc: 'Story, art, ideation' },
-        { value: 'transformation', label: 'Transformation', icon: '', desc: 'Convert X to Y' },
-        { value: 'retrieval_augmented', label: 'RAG', icon: '', desc: 'With external data' },
+        { value: 'smart', label: 'SMART', icon: '', desc: 'Specific, Measurable, Achievable, Relevant, Time-bound' },
+        { value: 'ice', label: 'ICE', icon: '', desc: 'Idea, Context, Execution' },
+        { value: '5w1h', label: '5W1H', icon: '', desc: 'Who, What, When, Where, Why, How' },
       ]
-    }
+    },
   };
 
 
@@ -120,7 +111,7 @@ const PromptGenerator = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate prompt');
+        throw new Error(data.detail || data.error || 'Failed to generate prompt');
       }
 
       setResult(data);

@@ -1,88 +1,90 @@
-// Smart prompt type suggestions based on user input keywords
+// Smart prompt framework suggestions based on user input keywords
 
 const keywordMap = {
-    // Chain-of-Thought triggers
-    chain_of_thought: ['step by step', 'explain', 'how to', 'solve', 'calculate', 'debug', 'analyze', 'break down', 'reason', 'think through'],
+    // RTF - general purpose, role-based tasks
+    rtf: ['create', 'make', 'build', 'generate', 'write', 'produce', 'design', 'develop'],
 
-    // Role-Based triggers
-    role_based: ['expert', 'professional', 'specialist', 'developer', 'designer', 'writer', 'consultant', 'coach', 'teacher', 'mentor'],
+    // RACE - when context and expectations matter
+    race: ['expect', 'context', 'background', 'given that', 'considering'],
 
-    // Creative triggers
-    creative: ['story', 'creative', 'imagine', 'write', 'poem', 'song', 'script', 'narrative', 'fiction', 'art', 'design', 'brainstorm', 'ideas'],
+    // RISEN - detailed step-by-step tasks
+    risen: ['step by step', 'how to', 'guide', 'instructions', 'process', 'procedure', 'walkthrough'],
 
-    // Few-Shot triggers
-    few_shot: ['example', 'like this', 'similar to', 'pattern', 'format like', 'same style'],
+    // CARE - when examples help
+    care: ['example', 'like this', 'similar to', 'pattern', 'format like', 'same style', 'show me'],
 
-    // Template triggers
-    template: ['template', 'format', 'structure', 'schema', 'outline', 'framework'],
+    // COAST - scenario-based tasks
+    coast: ['scenario', 'situation', 'use case', 'what if', 'imagine'],
 
-    // Goal-Oriented triggers
-    goal_oriented: ['goal', 'objective', 'achieve', 'target', 'outcome', 'result', 'accomplish', 'success'],
+    // TRACE - action-oriented with examples
+    trace: ['trace', 'follow', 'replicate', 'reproduce'],
 
-    // Evaluation triggers  
-    evaluation: ['evaluate', 'review', 'judge', 'score', 'rate', 'assess', 'compare', 'critique', 'feedback'],
+    // SMART - goal-driven tasks
+    smart: ['goal', 'objective', 'achieve', 'target', 'outcome', 'result', 'accomplish', 'success', 'measure'],
 
-    // Planning triggers
-    planning: ['plan', 'strategy', 'roadmap', 'timeline', 'schedule', 'project', 'implement', 'execute'],
+    // CRISPE - complex, personality-driven
+    crispe: ['expert', 'professional', 'specialist', 'consultant', 'coach', 'teacher', 'mentor', 'personality'],
 
-    // Transformation triggers
-    transformation: ['convert', 'transform', 'translate', 'change', 'rewrite', 'adapt', 'modify', 'refactor'],
+    // APE - simple, direct actions
+    ape: ['simple', 'direct', 'quick', 'just', 'do'],
 
-    // Multi-Agent triggers
-    multi_agent: ['team', 'collaborate', 'multiple perspectives', 'different roles', 'debate', 'discuss'],
+    // TAG - audience-focused
+    tag: ['audience', 'readers', 'users', 'customers', 'students', 'beginners', 'advanced'],
 
-    // Delegation triggers
-    delegation: ['break down', 'subtasks', 'divide', 'assign', 'components', 'parts'],
+    // ERA - expectation-first
+    era: ['quality', 'standard', 'level', 'professional'],
 
-    // Meta-Prompt triggers
-    meta_prompt: ['prompt', 'better prompt', 'improve prompt', 'optimize prompt', 'prompt engineering'],
+    // PASTOR - persuasion and marketing
+    pastor: ['marketing', 'sell', 'persuade', 'convince', 'campaign', 'brand', 'advertisement', 'pitch'],
 
-    // Socratic triggers
-    socratic: ['question', 'understand', 'why', 'what if', 'explore', 'discover', 'learn'],
+    // BAB - transformation stories
+    bab: ['before', 'after', 'transform', 'change', 'improve', 'upgrade'],
 
-    // Constraint-Based triggers
-    constraint_based: ['limit', 'constraint', 'within', 'maximum', 'minimum', 'only', 'must', 'should not', 'avoid'],
+    // AIDA - attention-grabbing content
+    aida: ['attention', 'hook', 'engage', 'interest', 'desire', 'call to action', 'landing page'],
 
-    // Refinement triggers
-    refinement: ['improve', 'refine', 'polish', 'enhance', 'better', 'iterate', 'revision'],
+    // SCQA - problem analysis
+    scqa: ['problem', 'challenge', 'issue', 'complication', 'question', 'answer', 'solve'],
 
-    // Self-Consistency triggers
-    self_consistency: ['verify', 'double check', 'confirm', 'validate', 'multiple ways', 'cross-check'],
+    // GROW - coaching and planning
+    grow: ['plan', 'strategy', 'roadmap', 'timeline', 'options', 'decision'],
 
-    // Retrieval-Augmented triggers
-    retrieval_augmented: ['research', 'find', 'search', 'latest', 'current', 'source', 'cite', 'reference', 'data'],
+    // STAR - structured responses
+    star: ['situation', 'task', 'action', 'result', 'case study'],
 
-    // Zero-Shot (default for direct requests)
-    zero_shot: ['simple', 'direct', 'quick', 'just'],
+    // PAR - problem-solution
+    par: ['fix', 'resolve', 'debug', 'troubleshoot', 'solution'],
 
-    // One-Shot triggers
-    one_shot: ['one example', 'single example', 'show me one'],
+    // CLEAR - constrained tasks
+    clear: ['limit', 'constraint', 'within', 'maximum', 'minimum', 'boundary', 'scope'],
 
-    // Contextual triggers
-    contextual: ['context', 'background', 'situation', 'given that', 'considering', 'in the case of'],
+    // PEEL - argumentative/analytical
+    peel: ['argue', 'evidence', 'explain', 'analyze', 'essay', 'article', 'blog'],
 
-    // Instruction (general)
-    instruction: ['do', 'make', 'create', 'build', 'generate', 'write', 'produce'],
+    // ICE - idea development
+    ice: ['idea', 'concept', 'brainstorm', 'creative', 'story', 'fiction', 'art', 'imagine'],
+
+    // 5W1H - comprehensive coverage
+    '5w1h': ['who', 'what', 'when', 'where', 'why', 'how', 'research', 'investigate', 'report'],
 };
 
 export const getSuggestions = (input, topN = 3) => {
     if (!input || input.trim().length < 3) {
         return [
-            { type: 'instruction', score: 1, reason: 'Default - good for most tasks' }
+            { type: 'rtf', score: 1, reason: 'Default - works great for most tasks' }
         ];
     }
 
     const lowerInput = input.toLowerCase();
     const scores = {};
 
-    // Calculate scores based on keyword matches
     for (const [promptType, keywords] of Object.entries(keywordMap)) {
         let score = 0;
         const matchedKeywords = [];
 
         for (const keyword of keywords) {
             if (lowerInput.includes(keyword)) {
-                score += keyword.split(' ').length; // Longer phrases get more weight
+                score += keyword.split(' ').length;
                 matchedKeywords.push(keyword);
             }
         }
@@ -97,47 +99,45 @@ export const getSuggestions = (input, topN = 3) => {
         }
     }
 
-    // Sort by score and return top N
     const sorted = Object.values(scores)
         .sort((a, b) => b.score - a.score)
         .slice(0, topN);
 
-    // If no matches, return defaults
     if (sorted.length === 0) {
         return [
-            { type: 'instruction', score: 0.5, reason: 'General purpose' },
-            { type: 'chain_of_thought', score: 0.3, reason: 'For complex tasks' },
-            { type: 'role_based', score: 0.2, reason: 'For expert advice' },
+            { type: 'rtf', score: 0.5, reason: 'General purpose' },
+            { type: 'risen', score: 0.3, reason: 'For detailed tasks' },
+            { type: 'crispe', score: 0.2, reason: 'For expert advice' },
         ];
     }
 
     return sorted;
 };
 
-// Get prompt type label from value
 export const getPromptTypeLabel = (type) => {
     const labels = {
-        instruction: 'Instruction',
-        contextual: 'Contextual',
-        role_based: 'Role-Based',
-        zero_shot: 'Zero-Shot',
-        one_shot: 'One-Shot',
-        few_shot: 'Few-Shot',
-        chain_of_thought: 'Chain-of-Thought',
-        self_consistency: 'Self-Consistency',
-        refinement: 'Refinement',
-        goal_oriented: 'Goal-Oriented',
-        constraint_based: 'Constraint-Based',
-        template: 'Template',
-        meta_prompt: 'Meta-Prompt',
-        socratic: 'Socratic',
-        evaluation: 'Evaluation',
-        multi_agent: 'Multi-Agent',
-        delegation: 'Delegation',
-        planning: 'Planning',
-        transformation: 'Transformation',
-        creative: 'Creative',
-        retrieval_augmented: 'RAG',
+        rtf: 'RTF',
+        race: 'RACE',
+        risen: 'RISEN',
+        care: 'CARE',
+        coast: 'COAST',
+        trace: 'TRACE',
+        smart: 'SMART',
+        crispe: 'CRISPE',
+        ape: 'APE',
+        tag: 'TAG',
+        era: 'ERA',
+        pastor: 'PASTOR',
+        bab: 'BAB',
+        aida: 'AIDA',
+        scqa: 'SCQA',
+        grow: 'GROW',
+        star: 'STAR',
+        par: 'PAR',
+        clear: 'CLEAR',
+        peel: 'PEEL',
+        ice: 'ICE',
+        '5w1h': '5W1H',
     };
     return labels[type] || type;
 };
