@@ -1,6 +1,7 @@
 {
   "name": "prompt-generator-frontend",
   "private": true,
+  "type": "module",
   "version": "1.0.0",
   "description": "AI-powered prompt generator frontend",
   "scripts": {

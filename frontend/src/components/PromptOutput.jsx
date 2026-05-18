@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { exportPrompt } from '../utils/exporters';
 import { calculateQualityScore } from '../utils/qualityScorer';
 import { savePrompt } from '../utils/storage';
@@ -45,7 +45,7 @@ const renderMarkdown = (text) => {
       elements.push(
         <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', paddingLeft: `${Math.max(0, indent) * 4}px`, margin: '0.125rem 0' }}>
           <span style={{ color: 'rgb(var(--color-accent))', marginTop: '0.375rem', fontSize: '0.375rem' }}>●</span>
-          <span className="prose-sm" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }} dangerouslySetInnerHTML={{ __html: inlineMd(content) }} />
+          <span className="prose-sm" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{inlineMd(content)}</span>
         </div>
       );
       return;
@@ -56,7 +56,7 @@ const renderMarkdown = (text) => {
       elements.push(
         <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', margin: '0.125rem 0' }}>
           <span style={{ color: 'rgb(var(--color-primary))', fontWeight: 600, fontSize: '0.8rem', minWidth: '1.25rem' }}>{numMatch[1]}.</span>
-          <span className="prose-sm" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }} dangerouslySetInnerHTML={{ __html: inlineMd(numMatch[2]) }} />
+          <span className="prose-sm" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{inlineMd(numMatch[2])}</span>
         </div>
       );
       return;
@@ -64,7 +64,7 @@ const renderMarkdown = (text) => {
 
     if (line.trim() === '') { elements.push(<div key={i} style={{ height: '0.5rem' }} />); return; }
 
-    elements.push(<p key={i} className="prose-sm" dangerouslySetInnerHTML={{ __html: inlineMd(line) }} />);
+    elements.push(<p key={i} className="prose-sm">{inlineMd(line)}</p>);
   });
 
   return elements;
@@ -72,10 +72,33 @@ const renderMarkdown = (text) => {
 
 // Inline markdown: **bold**, *italic*, `code`
 const inlineMd = (text) => {
-  return text
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/`(.+?)`/g, '<code>$1</code>');
+  const parts = [];
+  const pattern = /(\*\*[^*]+\*\*|`[^`]+`|\*[^*]+\*)/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+
+    const token = match[0];
+    const key = `${match.index}-${token}`;
+    if (token.startsWith('**')) {
+      parts.push(<strong key={key}>{token.slice(2, -2)}</strong>);
+    } else if (token.startsWith('`')) {
+      parts.push(<code key={key}>{token.slice(1, -1)}</code>);
+    } else {
+      parts.push(<em key={key}>{token.slice(1, -1)}</em>);
+    }
+    lastIndex = pattern.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts;
 };
 
 const PromptOutput = ({ result, intentOptions }) => {
@@ -100,7 +123,9 @@ const PromptOutput = ({ result, intentOptions }) => {
     }
   }, [result]);
 
-  const copyToClipboard = async () => {
+  const getIntentLabel = useCallback((val) => intentOptions.find(o => o.value === val)?.label || val, [intentOptions]);
+
+  const copyToClipboard = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(result.optimized_prompt);
       setCopied(true);
@@ -108,30 +133,50 @@ const PromptOutput = ({ result, intentOptions }) => {
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
-  };
+  }, [result]);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     savePrompt({
       title: `${getIntentLabel(result.intent)} - ${result.original_prompt.substring(0, 30)}...`,
       basePrompt: result.original_prompt,
       promptType: result.intent,
       optimizedPrompt: result.optimized_prompt,
+      aiModel: result.ai_model,
     });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
-  };
+  }, [getIntentLabel, result]);
 
-  const handleExport = (format) => {
+  const handleExport = useCallback((format) => {
     exportPrompt({
       title: getIntentLabel(result.intent),
       basePrompt: result.original_prompt,
       promptType: result.intent,
       optimizedPrompt: result.optimized_prompt,
+      aiModel: result.ai_model,
     }, format);
     setShowExportMenu(false);
-  };
+  }, [getIntentLabel, result]);
 
-  const getIntentLabel = (val) => intentOptions.find(o => o.value === val)?.label || val;
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!result?.optimized_prompt) return;
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+        copyToClipboard();
+      }
+      if (e.ctrlKey && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        handleSave();
+      }
+      if (e.ctrlKey && e.key.toLowerCase() === 'e') {
+        e.preventDefault();
+        handleExport('markdown');
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [copyToClipboard, handleExport, handleSave, result]);
 
   const getScoreColor = (score) => {
     if (score >= 80) return 'rgb(var(--color-success))';
@@ -208,7 +253,7 @@ const PromptOutput = ({ result, intentOptions }) => {
             Your Input
           </h4>
           <div className="original-prompt">
-            <p className="original-prompt__text">"{result.original_prompt}"</p>
+            <p className="original-prompt__text">{result.original_prompt}</p>
           </div>
         </div>
 

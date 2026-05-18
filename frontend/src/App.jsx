@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import PromptGenerator from './components/PromptGenerator';
 import ThemeToggle from './components/ThemeToggle';
 import ShortcutsHelp from './components/ShortcutsHelp';
-import { getTheme } from './utils/storage';
+import { getTheme, setTheme as persistTheme } from './utils/storage';
 import './index.css';
 
 function App() {
@@ -24,8 +24,7 @@ function App() {
       e.preventDefault();
       const newTheme = theme === 'light' ? 'dark' : 'light';
       setTheme(newTheme);
-      document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('promptbuddy_theme', newTheme);
+      persistTheme(newTheme);
     }
     if (e.key === 'Escape') {
       setShowShortcuts(false);
@@ -85,7 +84,7 @@ function App() {
       <footer className="app-footer">
         <div className="app-footer__inner">
           <p className="app-footer__text">
-            © 2025 <span className="app-footer__brand">PromptBuddy</span>. Crafted for AI.
+            © 2026 <span className="app-footer__brand">PromptBuddy</span>. Crafted for AI.
           </p>
           <span className="app-footer__shortcuts">
             Press <span className="kbd">Ctrl</span> + <span className="kbd">/</span> for shortcuts

@@ -1,11 +1,11 @@
 import React from 'react';
+import { setTheme as persistTheme } from '../utils/storage';
 
 const ThemeToggle = ({ theme, setTheme }) => {
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('promptbuddy_theme', newTheme);
+        persistTheme(newTheme);
     };
 
     return (
@@ -14,6 +14,7 @@ const ThemeToggle = ({ theme, setTheme }) => {
             className="btn-secondary"
             style={{ padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
         >
             {theme === 'light' ? (
                 <svg style={{ width: '1.25rem', height: '1.25rem', color: 'var(--text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">

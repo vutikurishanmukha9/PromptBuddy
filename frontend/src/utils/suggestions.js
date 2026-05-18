@@ -1,4 +1,5 @@
 // Smart prompt framework suggestions based on user input keywords
+import { getFrameworkLabel } from './frameworks';
 
 const keywordMap = {
     // RTF - general purpose, role-based tasks
@@ -115,29 +116,5 @@ export const getSuggestions = (input, topN = 3) => {
 };
 
 export const getPromptTypeLabel = (type) => {
-    const labels = {
-        rtf: 'RTF',
-        race: 'RACE',
-        risen: 'RISEN',
-        care: 'CARE',
-        coast: 'COAST',
-        trace: 'TRACE',
-        smart: 'SMART',
-        crispe: 'CRISPE',
-        ape: 'APE',
-        tag: 'TAG',
-        era: 'ERA',
-        pastor: 'PASTOR',
-        bab: 'BAB',
-        aida: 'AIDA',
-        scqa: 'SCQA',
-        grow: 'GROW',
-        star: 'STAR',
-        par: 'PAR',
-        clear: 'CLEAR',
-        peel: 'PEEL',
-        ice: 'ICE',
-        '5w1h': '5W1H',
-    };
-    return labels[type] || type;
+    return getFrameworkLabel(type);
 };

@@ -15,6 +15,7 @@ const PromptLibrary = ({ isOpen, onClose, onLoadPrompt }) => {
     }, [isOpen]);
 
     const handleDelete = (id) => {
+        if (!window.confirm('Delete this saved prompt?')) return;
         deletePrompt(id);
         setSavedPrompts(getSavedPrompts());
     };
@@ -28,7 +29,9 @@ const PromptLibrary = ({ isOpen, onClose, onLoadPrompt }) => {
 
     const filteredPrompts = savedPrompts.filter(p =>
         p.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.basePrompt?.toLowerCase().includes(searchQuery.toLowerCase())
+        p.basePrompt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.optimizedPrompt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.promptType?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const filteredHistory = history.filter(h =>
@@ -149,7 +152,12 @@ const PromptLibrary = ({ isOpen, onClose, onLoadPrompt }) => {
                                             className="library-item"
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => {
-                                                onLoadPrompt({ basePrompt: item.basePrompt, promptType: item.promptType });
+                                                onLoadPrompt({
+                                                    basePrompt: item.basePrompt,
+                                                    promptType: item.promptType,
+                                                    optimizedPrompt: item.optimizedPrompt,
+                                                    aiModel: item.aiModel,
+                                                });
                                                 onClose();
                                             }}
                                         >

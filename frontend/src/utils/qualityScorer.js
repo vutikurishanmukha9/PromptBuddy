@@ -97,6 +97,23 @@ const analyzeClarity = (text) => {
     };
 };
 
+const analyzeCompleteness = (text) => {
+    const lowerText = text.toLowerCase();
+    const checks = [
+        { key: 'role', terms: ['you are', 'act as', 'role:'] },
+        { key: 'audience', terms: ['audience', 'for a', 'for an', 'stakeholder', 'reader'] },
+        { key: 'format', terms: ['format', 'return as', 'markdown', 'json', 'table', 'sections'] },
+        { key: 'constraints', terms: ['constraint', 'limit', 'must', 'do not', 'avoid', 'include'] },
+        { key: 'success', terms: ['success', 'criteria', 'ensure', 'quality', 'meets'] },
+    ];
+    const hits = checks.filter(check => check.terms.some(term => lowerText.includes(term)));
+    const score = Math.min(100, 35 + hits.length * 13);
+    return {
+        score,
+        feedback: hits.length >= 4 ? 'Covers core prompt ingredients' : 'Add role, audience, format, constraints, and success criteria',
+    };
+};
+
 export const calculateQualityScore = (promptText) => {
     if (!promptText || promptText.trim().length === 0) {
         return {
@@ -112,13 +129,15 @@ export const calculateQualityScore = (promptText) => {
     const structure = analyzeStructure(promptText);
     const actionability = analyzeActionability(promptText);
     const clarity = analyzeClarity(promptText);
+    const completeness = analyzeCompleteness(promptText);
 
     const weights = {
-        length: 0.15,
-        specificity: 0.25,
-        structure: 0.20,
-        actionability: 0.25,
+        length: 0.10,
+        specificity: 0.22,
+        structure: 0.18,
+        actionability: 0.20,
         clarity: 0.15,
+        completeness: 0.15,
     };
 
     const overall = Math.round(
@@ -126,7 +145,8 @@ export const calculateQualityScore = (promptText) => {
         specificity.score * weights.specificity +
         structure.score * weights.structure +
         actionability.score * weights.actionability +
-        clarity.score * weights.clarity
+        clarity.score * weights.clarity +
+        completeness.score * weights.completeness
     );
 
     let grade, gradeColor;
@@ -142,15 +162,16 @@ export const calculateQualityScore = (promptText) => {
         grade,
         gradeColor,
         breakdown: {
-            length: { ...length, weight: '15%' },
-            specificity: { ...specificity, weight: '25%' },
-            structure: { ...structure, weight: '20%' },
-            actionability: { ...actionability, weight: '25%' },
+            length: { ...length, weight: '10%' },
+            specificity: { ...specificity, weight: '22%' },
+            structure: { ...structure, weight: '18%' },
+            actionability: { ...actionability, weight: '20%' },
             clarity: { ...clarity, weight: '15%' },
+            completeness: { ...completeness, weight: '15%' },
         },
         feedback: overall >= 70
             ? 'Good quality prompt!'
-            : 'Consider improving: ' + [specificity, actionability, structure]
+            : 'Consider improving: ' + [specificity, actionability, structure, completeness]
                 .filter(m => m.score < 70)
                 .map(m => m.feedback)
                 .slice(0, 2)
