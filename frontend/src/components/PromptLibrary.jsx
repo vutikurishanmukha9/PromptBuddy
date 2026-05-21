@@ -49,7 +49,7 @@ const PromptLibrary = ({ isOpen, onClose, onLoadPrompt }) => {
                 style={{ maxWidth: '48rem' }}
             >
                 {/* Header */}
-                <div className="modal-header" style={{ background: 'linear-gradient(135deg, rgb(var(--color-primary)), rgb(var(--color-accent)))' }}>
+                <div className="modal-header modal-header--primary">
                     <h2 className="modal-header__title">Prompt Library</h2>
                     <button onClick={onClose} className="modal-header__close">
                         <svg style={{ width: '1.5rem', height: '1.5rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,7 +89,7 @@ const PromptLibrary = ({ isOpen, onClose, onLoadPrompt }) => {
                     {activeTab === 'saved' ? (
                         filteredPrompts.length === 0 ? (
                             <div className="empty-state">
-                                <div className="empty-state__icon">—</div>
+                                <div className="empty-state__icon">No items</div>
                                 <p className="empty-state__title">No saved prompts yet</p>
                                 <p className="empty-state__desc">Generate and save prompts to build your library</p>
                             </div>
@@ -140,7 +140,7 @@ const PromptLibrary = ({ isOpen, onClose, onLoadPrompt }) => {
                             )}
                             {filteredHistory.length === 0 ? (
                                 <div className="empty-state">
-                                    <div className="empty-state__icon">—</div>
+                                    <div className="empty-state__icon">No items</div>
                                     <p className="empty-state__title">No history yet</p>
                                     <p className="empty-state__desc">Your generated prompts will appear here</p>
                                 </div>

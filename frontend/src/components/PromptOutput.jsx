@@ -44,7 +44,7 @@ const renderMarkdown = (text) => {
       const content = line.trim().slice(2);
       elements.push(
         <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', paddingLeft: `${Math.max(0, indent) * 4}px`, margin: '0.125rem 0' }}>
-          <span style={{ color: 'rgb(var(--color-accent))', marginTop: '0.375rem', fontSize: '0.375rem' }}>●</span>
+          <span className="list-dot" aria-hidden="true" />
           <span className="prose-sm" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{inlineMd(content)}</span>
         </div>
       );
@@ -211,11 +211,11 @@ const PromptOutput = ({ result, intentOptions }) => {
               onClick={() => setShowQualityDetails(!showQualityDetails)}
               title="Click for details"
             >
-              <span style={{ color: 'white', fontSize: '0.8rem' }}>Quality:</span>
-              <span style={{ fontSize: '1.25rem', fontWeight: 800, color: qualityScore.overall >= 70 ? 'white' : '#fde68a' }}>
+              <span className="quality-badge__label">Quality:</span>
+              <span className={`quality-badge__grade ${qualityScore.overall >= 70 ? '' : 'quality-badge__grade--warning'}`}>
                 {qualityScore.grade}
               </span>
-              <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem' }}>({qualityScore.overall}%)</span>
+              <span className="quality-badge__score">({qualityScore.overall}%)</span>
             </div>
           )}
         </div>
@@ -360,10 +360,10 @@ const PromptOutput = ({ result, intentOptions }) => {
           {previewMode === 'chatgpt' && (
             <div className="output-preview output-preview--chatgpt">
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
-                <div style={{ width: '1.75rem', height: '1.75rem', background: '#19c37d', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span style={{ color: 'white', fontSize: '0.7rem', fontWeight: 700 }}>U</span>
+                <div className="chatgpt-avatar">
+                  <span>U</span>
                 </div>
-                <p style={{ fontSize: '0.8rem', color: '#ececf1', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                <p className="chatgpt-preview-text">
                   {result.optimized_prompt}
                 </p>
               </div>
@@ -373,7 +373,7 @@ const PromptOutput = ({ result, intentOptions }) => {
           {previewMode === 'claude' && (
             <div className="output-preview output-preview--claude">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                <div style={{ width: '1.5rem', height: '1.5rem', background: '#d97706', borderRadius: '50%' }}></div>
+                <div className="claude-avatar"></div>
                 <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Human</span>
               </div>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>

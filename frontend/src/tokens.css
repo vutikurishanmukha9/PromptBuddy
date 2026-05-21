@@ -1,0 +1,40 @@
+/* Hallmark | tokens: PromptBuddy workbench | tone: product-grade | anchor hue: teal */
+:root {
+  --color-paper: oklch(97% 0.01 250);
+  --color-paper-2: oklch(94% 0.014 245);
+  --color-ink: oklch(23% 0.045 250);
+  --color-ink-2: oklch(42% 0.04 245);
+  --color-rule: oklch(87% 0.02 245);
+  --color-accent-token: oklch(46% 0.09 190);
+  --color-accent-ink: oklch(99% 0.005 190);
+  --color-focus: oklch(57% 0.11 190);
+
+  --font-display: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-body: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", source-code-pro, Menlo, Monaco, Consolas, monospace;
+
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4.5rem;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+  --text-display: clamp(1.9rem, 4vw, 2.75rem);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-short: 180ms;
+  --dur-medium: 260ms;
+  --rule-thin: 1px;
+  --radius-card: 10px;
+  --radius-input: 10px;
+  --radius-pill: 999px;
+}

@@ -53,6 +53,11 @@ function App() {
             </div>
           </div>
 
+          <div className="app-header__context" aria-label="Workspace status">
+            <span>Personal workspace</span>
+            <span>Drafts saved locally</span>
+          </div>
+
           <div className="app-header__actions animate-fadeIn">
             <button
               onClick={() => setShowShortcuts(true)}
@@ -66,11 +71,6 @@ function App() {
             </button>
 
             <ThemeToggle theme={theme} setTheme={setTheme} />
-
-            <div className="app-header__status">
-              <div className="app-header__status-dot"></div>
-              <span className="app-header__status-text">Live</span>
-            </div>
           </div>
         </div>
       </header>
@@ -84,7 +84,7 @@ function App() {
       <footer className="app-footer">
         <div className="app-footer__inner">
           <p className="app-footer__text">
-            © 2026 <span className="app-footer__brand">PromptBuddy</span>. Crafted for AI.
+            (c) 2026 <span className="app-footer__brand">PromptBuddy</span>. Crafted for AI.
           </p>
           <span className="app-footer__shortcuts">
             Press <span className="kbd">Ctrl</span> + <span className="kbd">/</span> for shortcuts

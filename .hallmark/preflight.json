@@ -1,0 +1,9 @@
+{
+  "date": "2026-05-21",
+  "framework": "Vite React",
+  "font_stack": "Inter + JetBrains Mono via frontend/src/index.css",
+  "palette": "CSS custom properties in frontend/src/index.css with Hallmark token export in frontend/src/tokens.css",
+  "motion": "motion-cut; no motion library installed",
+  "spacing": "custom CSS radius and spacing tokens, 4-point Hallmark export",
+  "preserve": ["React component ownership", "local CSS token structure", "dark mode support"]
+}

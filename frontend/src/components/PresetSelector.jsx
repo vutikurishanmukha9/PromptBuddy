@@ -27,7 +27,7 @@ const PresetSelector = ({ onSelectPreset, onClose }) => {
                 style={{ maxWidth: '48rem' }}
             >
                 {/* Header */}
-                <div className="modal-header" style={{ background: 'linear-gradient(135deg, rgb(var(--color-warning)), #d97706)' }}>
+                <div className="modal-header modal-header--warning">
                     <h2 className="modal-header__title">Industry Presets</h2>
                     <button onClick={onClose} className="modal-header__close">
                         <svg style={{ width: '1.5rem', height: '1.5rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,7 +98,7 @@ const PresetSelector = ({ onSelectPreset, onClose }) => {
 
                         {filteredPresets.length === 0 && (
                             <div className="empty-state">
-                                <div className="empty-state__icon">—</div>
+                                <div className="empty-state__icon">No match</div>
                                 <p className="empty-state__title">No presets found</p>
                             </div>
                         )}
