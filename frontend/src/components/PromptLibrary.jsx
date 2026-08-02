@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { getSavedPrompts, deletePrompt, getPromptHistory, clearHistory } from '../utils/storage';
+import React, { useState, useEffect, useRef } from 'react';
+import { getSavedPrompts, deletePrompt, getPromptHistory, clearHistory, exportFullLibraryJSON, importFullLibraryJSON } from '../utils/storage';
 
 const PromptLibrary = ({ isOpen, onClose, onLoadPrompt }) => {
     const [activeTab, setActiveTab] = useState('saved');
     const [savedPrompts, setSavedPrompts] = useState([]);
     const [history, setHistory] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectedFolder, setSelectedFolder] = useState('all');
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -27,12 +29,30 @@ const PromptLibrary = ({ isOpen, onClose, onLoadPrompt }) => {
         }
     };
 
-    const filteredPrompts = savedPrompts.filter(p =>
-        p.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.basePrompt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.optimizedPrompt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.promptType?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const handleImportFile = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const content = event.target?.result;
+            if (content && importFullLibraryJSON(content)) {
+                setSavedPrompts(getSavedPrompts());
+                alert('Prompt library restored successfully!');
+            } else {
+                alert('Failed to import prompt library JSON.');
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    const filteredPrompts = savedPrompts.filter(p => {
+        const matchesQuery = p.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.basePrompt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.optimizedPrompt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.promptType?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesFolder = selectedFolder === 'all' || p.category === selectedFolder || p.promptType === selectedFolder;
+        return matchesQuery && matchesFolder;
+    });
 
     const filteredHistory = history.filter(h =>
         h.basePrompt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -49,13 +69,38 @@ const PromptLibrary = ({ isOpen, onClose, onLoadPrompt }) => {
                 style={{ maxWidth: '48rem' }}
             >
                 {/* Header */}
-                <div className="modal-header modal-header--primary">
+                <div className="modal-header modal-header--primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <h2 className="modal-header__title">Prompt Library</h2>
-                    <button onClick={onClose} className="modal-header__close">
-                        <svg style={{ width: '1.5rem', height: '1.5rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <button
+                            onClick={exportFullLibraryJSON}
+                            className="btn-secondary"
+                            style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
+                            title="Export full library backup as JSON"
+                        >
+                            Backup JSON
+                        </button>
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="btn-secondary"
+                            style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
+                            title="Restore library from JSON backup file"
+                        >
+                            Restore
+                        </button>
+                        <input
+                            type="file"
+                            accept=".json"
+                            ref={fileInputRef}
+                            onChange={handleImportFile}
+                            style={{ display: 'none' }}
+                        />
+                        <button onClick={onClose} className="modal-header__close">
+                            <svg style={{ width: '1.5rem', height: '1.5rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Tabs */}
@@ -74,14 +119,26 @@ const PromptLibrary = ({ isOpen, onClose, onLoadPrompt }) => {
                     </button>
                 </div>
 
-                {/* Search */}
-                <div className="modal-search">
+                {/* Search & Folder Filters */}
+                <div className="modal-search" style={{ display: 'flex', gap: '0.5rem' }}>
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search prompts..."
+                        style={{ flex: 1 }}
                     />
+                    <select
+                        value={selectedFolder}
+                        onChange={(e) => setSelectedFolder(e.target.value)}
+                        style={{ fontSize: '0.8rem', padding: '0.25rem 0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+                    >
+                        <option value="all">All Folders</option>
+                        <option value="rtf">RTF</option>
+                        <option value="risen">RISEN</option>
+                        <option value="star">STAR</option>
+                        <option value="5w1h">5W1H</option>
+                    </select>
                 </div>
 
                 {/* Content */}
@@ -90,7 +147,7 @@ const PromptLibrary = ({ isOpen, onClose, onLoadPrompt }) => {
                         filteredPrompts.length === 0 ? (
                             <div className="empty-state">
                                 <div className="empty-state__icon">No items</div>
-                                <p className="empty-state__title">No saved prompts yet</p>
+                                <p className="empty-state__title">No saved prompts found</p>
                                 <p className="empty-state__desc">Generate and save prompts to build your library</p>
                             </div>
                         ) : (

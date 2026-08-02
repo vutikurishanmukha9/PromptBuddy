@@ -154,3 +154,38 @@ export const updateSettings = (updates) => {
     writeJSON(STORAGE_KEYS.SETTINGS, settings);
     return settings;
 };
+
+export const exportFullLibraryJSON = () => {
+    const library = getSavedPrompts();
+    const history = getPromptHistory();
+    const payload = {
+        version: '4.1.0',
+        exportedAt: new Date().toISOString(),
+        savedPrompts: library,
+        history: history,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `promptbuddy_backup_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+};
+
+export const importFullLibraryJSON = (jsonText) => {
+    try {
+        const parsed = JSON.parse(jsonText);
+        if (Array.isArray(parsed.savedPrompts)) {
+            const existing = getSavedPrompts();
+            const merged = [...parsed.savedPrompts, ...existing];
+            const unique = Array.from(new Map(merged.map(p => [p.id, p])).values());
+            writeJSON(STORAGE_KEYS.SAVED_PROMPTS, unique);
+        }
+        return true;
+    } catch {
+        return false;
+    }
+};

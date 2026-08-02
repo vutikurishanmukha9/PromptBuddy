@@ -2,12 +2,15 @@ import React, { useState, useEffect, useCallback } from 'react';
 import PromptGenerator from './components/PromptGenerator';
 import ThemeToggle from './components/ThemeToggle';
 import ShortcutsHelp from './components/ShortcutsHelp';
+import CommandPalette from './components/CommandPalette';
 import { getTheme, setTheme as persistTheme } from './utils/storage';
 import './index.css';
 
 function App() {
   const [theme, setTheme] = useState('light');
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
+  const [externalCommand, setExternalCommand] = useState(null);
 
   useEffect(() => {
     const savedTheme = getTheme();
@@ -15,21 +18,30 @@ function App() {
     document.documentElement.setAttribute('data-theme', savedTheme);
   }, []);
 
+  const toggleTheme = useCallback(() => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    persistTheme(newTheme);
+  }, [theme]);
+
   const handleKeyDown = useCallback((e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      setShowCommandPalette(prev => !prev);
+    }
     if (e.ctrlKey && e.key === '/') {
       e.preventDefault();
       setShowShortcuts(prev => !prev);
     }
     if (e.ctrlKey && e.key === 'd') {
       e.preventDefault();
-      const newTheme = theme === 'light' ? 'dark' : 'light';
-      setTheme(newTheme);
-      persistTheme(newTheme);
+      toggleTheme();
     }
     if (e.key === 'Escape') {
       setShowShortcuts(false);
+      setShowCommandPalette(false);
     }
-  }, [theme]);
+  }, [toggleTheme]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -60,6 +72,19 @@ function App() {
 
           <div className="app-header__actions animate-fadeIn">
             <button
+              onClick={() => setShowCommandPalette(true)}
+              className="btn-secondary"
+              title="Command Palette (Ctrl+K)"
+              style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}
+            >
+              <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span>Commands</span>
+              <span className="kbd">Ctrl+K</span>
+            </button>
+
+            <button
               onClick={() => setShowShortcuts(true)}
               className="btn-secondary"
               title="Keyboard shortcuts (Ctrl+/)"
@@ -77,7 +102,7 @@ function App() {
 
       {/* Main Content */}
       <main className="app-main animate-fadeIn">
-        <PromptGenerator />
+        <PromptGenerator externalCommand={externalCommand} />
       </main>
 
       {/* Footer */}
@@ -87,13 +112,23 @@ function App() {
             (c) 2026 <span className="app-footer__brand">PromptBuddy</span>. Crafted for AI.
           </p>
           <span className="app-footer__shortcuts">
-            Press <span className="kbd">Ctrl</span> + <span className="kbd">/</span> for shortcuts
+            Press <span className="kbd">Ctrl</span> + <span className="kbd">K</span> for commands
           </span>
         </div>
       </footer>
 
       {/* Shortcuts Help Modal */}
       <ShortcutsHelp isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
+
+      {/* Command Palette Modal */}
+      <CommandPalette
+        isOpen={showCommandPalette}
+        onClose={() => setShowCommandPalette(false)}
+        onSelectFramework={(fw) => setExternalCommand({ type: 'framework', value: fw })}
+        onSelectPreset={(pr) => setExternalCommand({ type: 'preset', value: pr })}
+        onToggleTheme={toggleTheme}
+        onOpenLibrary={() => setExternalCommand({ type: 'open_library' })}
+      />
     </div>
   );
 }

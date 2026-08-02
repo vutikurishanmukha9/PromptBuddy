@@ -46,7 +46,7 @@ const outputFormats = ['Markdown', 'Table', 'Checklist', 'JSON', 'Step-by-step']
 const toneOptions = ['Clear', 'Executive', 'Technical', 'Persuasive', 'Friendly', 'Professional'];
 const depthOptions = ['Concise', 'Balanced', 'Detailed'];
 
-const PromptGenerator = () => {
+const PromptGenerator = ({ externalCommand }) => {
   const settings = getSettings();
   const [basePrompt, setBasePrompt] = useState('');
   const [audience, setAudience] = useState('');
@@ -65,20 +65,48 @@ const PromptGenerator = () => {
   const [showPresets, setShowPresets] = useState(false);
   const abortRef = useRef(null);
 
+  useEffect(() => {
+    if (!externalCommand) return;
+    if (externalCommand.type === 'framework') {
+      selectFramework(externalCommand.value);
+    } else if (externalCommand.type === 'preset') {
+      applyPreset(externalCommand.value);
+    } else if (externalCommand.type === 'open_library') {
+      setShowLibrary(true);
+    }
+  }, [externalCommand]);
+
   const selectedFramework = useMemo(() => ({
     label: getFrameworkLabel(intent),
     description: getFrameworkDescription(intent),
   }), [intent]);
 
+  const [variableValues, setVariableValues] = useState({});
+
+  const detectedVariables = useMemo(() => {
+    const matches = basePrompt.match(/\{\{([a-zA-Z0-9_]+)\}\}/g) || [];
+    return Array.from(new Set(matches.map(m => m.slice(2, -2))));
+  }, [basePrompt]);
+
+  const substitutedBasePrompt = useMemo(() => {
+    let text = basePrompt;
+    for (const varName of detectedVariables) {
+      if (variableValues[varName]) {
+        text = text.replaceAll(`{{${varName}}}`, variableValues[varName]);
+      }
+    }
+    return text;
+  }, [basePrompt, detectedVariables, variableValues]);
+
   const composedPrompt = useMemo(() => {
-    const parts = [basePrompt.trim()];
+    const parts = [substitutedBasePrompt.trim()];
     if (audience.trim()) parts.push(`Target audience: ${audience.trim()}`);
     if (format) parts.push(`Preferred output format: ${format}`);
     if (tone) parts.push(`Tone: ${tone}`);
     if (depth) parts.push(`Depth: ${depth}`);
     if (constraints.trim()) parts.push(`Constraints: ${constraints.trim()}`);
     return parts.filter(Boolean).join('\n');
-  }, [audience, basePrompt, constraints, depth, format, tone]);
+  }, [audience, constraints, depth, format, substitutedBasePrompt, tone]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -105,27 +133,83 @@ const PromptGenerator = () => {
 
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${API_URL}/generate`, {
+      const response = await fetch(`${API_URL}/generate/stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ base_prompt: trimmedPrompt, intent }),
         signal: controller.signal,
       });
 
-      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data.detail || data.error || 'Failed to generate prompt');
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.detail || errData.error || 'Failed to generate prompt');
       }
 
-      setResult(data);
-      if (getSettings().autoSaveHistory !== false) {
-        addToHistory({
-          basePrompt: data.original_prompt,
-          promptType: data.intent,
-          optimizedPrompt: data.optimized_prompt,
-          aiModel: data.ai_model,
-          requestId: data.request_id,
-        });
+      let text = '';
+      let model = 'AI Model';
+      let reqId = '';
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      setResult({
+        original_prompt: trimmedPrompt,
+        intent,
+        optimized_prompt: '',
+        ai_model: 'Optimizing...',
+        isStreaming: true,
+      });
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.token) {
+                text += data.token;
+                model = data.model || model;
+                reqId = data.request_id || reqId;
+                setResult(prev => ({
+                  ...prev,
+                  optimized_prompt: text,
+                  ai_model: model,
+                  request_id: reqId,
+                  isStreaming: true,
+                }));
+              } else if (data.done) {
+                reqId = data.request_id || reqId;
+                model = data.model || model;
+                const finalResult = {
+                  original_prompt: trimmedPrompt,
+                  intent,
+                  optimized_prompt: text,
+                  ai_model: model,
+                  request_id: reqId,
+                  latency_ms: data.latency_ms || 0,
+                  isStreaming: false,
+                };
+                setResult(finalResult);
+                if (getSettings().autoSaveHistory !== false && text.trim()) {
+                  addToHistory({
+                    basePrompt: trimmedPrompt,
+                    promptType: intent,
+                    optimizedPrompt: text,
+                    aiModel: model,
+                    requestId: reqId,
+                  });
+                }
+              }
+            } catch (err) {
+              // Ignore partial JSON parse errors
+            }
+          }
+        }
       }
     } catch (err) {
       if (err.name !== 'AbortError') {
@@ -249,11 +333,33 @@ const PromptGenerator = () => {
               id="base-prompt"
               value={basePrompt}
               onChange={(e) => setBasePrompt(e.target.value)}
-              placeholder="Paste a rough request, draft, ticket, brief, or idea..."
+              placeholder="Paste a rough request, draft, ticket, brief, or idea... (e.g. Write a script for {{app_name}})"
               className="prompt-textarea prompt-textarea--workbench"
               rows="8"
               required
             />
+
+            {detectedVariables.length > 0 && (
+              <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+                  Detected Prompt Variables:
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(10rem, 1fr))', gap: '0.5rem' }}>
+                  {detectedVariables.map((varName) => (
+                    <label key={varName} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{`{{${varName}}}`}</span>
+                      <input
+                        type="text"
+                        value={variableValues[varName] || ''}
+                        onChange={(e) => setVariableValues(prev => ({ ...prev, [varName]: e.target.value }))}
+                        placeholder={`Value for ${varName}...`}
+                        style={{ fontSize: '0.75rem', padding: '0.375rem 0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {!basePrompt && (
               <div className="example-row">

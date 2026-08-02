@@ -7,19 +7,20 @@ the frontend to render framework pickers without duplicating business rules.
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import random
 import time
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, AsyncGenerator
 from uuid import uuid4
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field, field_validator
 
 load_dotenv()
@@ -112,6 +113,7 @@ app.add_middleware(
 class GenerateRequest(BaseModel):
     base_prompt: str = Field(..., min_length=1, max_length=MAX_PROMPT_LENGTH)
     intent: str = Field(default="rtf")
+    model: str = Field(default="")
 
     @field_validator("base_prompt")
     @classmethod
@@ -140,9 +142,19 @@ class GenerateResponse(BaseModel):
     success: bool = True
 
 
-def _provider_headers() -> dict[str, str]:
+AVAILABLE_MODELS = [
+    {"id": "openai/gpt-4o-mini", "name": "GPT-4o Mini", "provider": "OpenAI", "context_length": 128000},
+    {"id": "google/gemini-2.0-flash-001", "name": "Gemini 2.0 Flash", "provider": "Google", "context_length": 1048576},
+    {"id": "mistralai/mistral-small", "name": "Mistral Small", "provider": "Mistral", "context_length": 32000},
+    {"id": "anthropic/claude-3.5-haiku", "name": "Claude 3.5 Haiku", "provider": "Anthropic", "context_length": 200000},
+    {"id": "deepseek/deepseek-r1-distill-llama-70b", "name": "DeepSeek R1", "provider": "DeepSeek", "context_length": 128000},
+]
+
+
+def _provider_headers(custom_api_key: str = "") -> dict[str, str]:
+    api_key = custom_api_key or OPENROUTER_API_KEY
     return {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
         "HTTP-Referer": OPENROUTER_SITE_URL,
         "X-Title": OPENROUTER_APP_TITLE,
@@ -168,8 +180,9 @@ def _extract_completion(payload: dict[str, Any]) -> str:
     return content.strip()
 
 
-async def call_openrouter(user_prompt: str, system_prompt: str, request_id: str) -> tuple[str, str]:
-    if not OPENROUTER_API_KEY or OPENROUTER_API_KEY == "PASTE_YOUR_OPENROUTER_KEY_HERE":
+async def call_openrouter(user_prompt: str, system_prompt: str, request_id: str, custom_api_key: str = "") -> tuple[str, str]:
+    api_key = custom_api_key or OPENROUTER_API_KEY
+    if not api_key or api_key == "PASTE_YOUR_OPENROUTER_KEY_HERE":
         raise HTTPException(status_code=503, detail="OpenRouter API key is not configured")
 
     last_error: Exception | None = None
@@ -178,7 +191,7 @@ async def call_openrouter(user_prompt: str, system_prompt: str, request_id: str)
             try:
                 response = await client.post(
                     f"{OPENROUTER_BASE_URL}/chat/completions",
-                    headers=_provider_headers(),
+                    headers=_provider_headers(api_key),
                     json={
                         "model": model_id,
                         "messages": [
@@ -241,6 +254,34 @@ async def health() -> dict[str, Any]:
     }
 
 
+@app.get("/models")
+async def list_models(x_openrouter_key: str | None = Header(default=None)) -> dict[str, Any]:
+    key = x_openrouter_key or OPENROUTER_API_KEY
+    if not key or key == "PASTE_YOUR_OPENROUTER_KEY_HERE":
+        return {"models": AVAILABLE_MODELS, "source": "static"}
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            res = await client.get(f"{OPENROUTER_BASE_URL}/models", headers=_provider_headers(key))
+            if res.status_code == 200:
+                data = res.json()
+                raw_models = data.get("data", [])
+                formatted = []
+                for m in raw_models[:30]:
+                    formatted.append({
+                        "id": m.get("id"),
+                        "name": m.get("name", m.get("id")),
+                        "provider": m.get("id", "").split("/")[0].capitalize(),
+                        "context_length": m.get("context_length", 32000),
+                    })
+                if formatted:
+                    return {"models": formatted, "source": "live"}
+    except Exception as exc:
+        logger.warning("Failed to fetch live models: %s", exc)
+
+    return {"models": AVAILABLE_MODELS, "source": "static"}
+
+
 @app.get("/intents")
 async def list_intents() -> dict[str, Any]:
     categories: dict[str, dict[str, Any]] = {}
@@ -253,7 +294,7 @@ async def list_intents() -> dict[str, Any]:
 
 
 @app.post("/generate", response_model=GenerateResponse)
-async def generate(req: GenerateRequest) -> GenerateResponse:
+async def generate(req: GenerateRequest, x_openrouter_key: str | None = Header(default=None)) -> GenerateResponse:
     request_id = str(uuid4())
     started_at = time.perf_counter()
     framework = FRAMEWORKS[req.intent]
@@ -262,7 +303,7 @@ async def generate(req: GenerateRequest) -> GenerateResponse:
         f"Raw input:\n```\n{req.base_prompt}\n```"
     )
 
-    text, model_name = await call_openrouter(user_message, framework.system_prompt, request_id)
+    text, model_name = await call_openrouter(user_message, framework.system_prompt, request_id, custom_api_key=x_openrouter_key or "")
     latency_ms = int((time.perf_counter() - started_at) * 1000)
 
     logger.info("request_id=%s intent=%s model=%s latency_ms=%s", request_id, req.intent, model_name, latency_ms)
@@ -274,6 +315,92 @@ async def generate(req: GenerateRequest) -> GenerateResponse:
         request_id=request_id,
         latency_ms=latency_ms,
     )
+
+
+@app.post("/generate/stream")
+async def generate_stream(req: GenerateRequest, x_openrouter_key: str | None = Header(default=None)) -> StreamingResponse:
+    request_id = str(uuid4())
+    started_at = time.perf_counter()
+    framework = FRAMEWORKS[req.intent]
+    user_message = (
+        "Optimize the following raw input into a production-ready prompt using the assigned framework.\n\n"
+        f"Raw input:\n```\n{req.base_prompt}\n```"
+    )
+
+    api_key = x_openrouter_key or OPENROUTER_API_KEY
+    if not api_key or api_key == "PASTE_YOUR_OPENROUTER_KEY_HERE":
+        raise HTTPException(status_code=503, detail="OpenRouter API key is not configured")
+
+    selected_model = req.model or _ordered_models()[0][0]
+    model_name = dict(OPENROUTER_MODELS).get(selected_model, selected_model)
+
+    async def event_generator() -> AsyncGenerator[str, None]:
+        async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT_SECONDS) as client:
+            try:
+                async with client.stream(
+                    "POST",
+                    f"{OPENROUTER_BASE_URL}/chat/completions",
+                    headers=_provider_headers(api_key),
+                    json={
+                        "model": selected_model,
+                        "messages": [
+                            {"role": "system", "content": framework.system_prompt},
+                            {"role": "user", "content": user_message},
+                        ],
+                        "temperature": 0.45,
+                        "max_tokens": 2048,
+                        "stream": True,
+                    },
+                ) as response:
+                    response.raise_for_status()
+                    async for line in response.aiter_lines():
+                        if not line or line.startswith(":"):
+                            continue
+                        if line.startswith("data: "):
+                            raw_data = line[6:].strip()
+                            if raw_data == "[DONE]":
+                                break
+                            try:
+                                payload = json.loads(raw_data)
+                                delta = payload["choices"][0]["delta"].get("content", "")
+                                if delta:
+                                    evt = json.dumps({"token": delta, "request_id": request_id, "model": model_name})
+                                    yield f"data: {evt}\n\n"
+                            except Exception:
+                                pass
+                latency_ms = int((time.perf_counter() - started_at) * 1000)
+                final_evt = json.dumps({"done": True, "request_id": request_id, "model": model_name, "latency_ms": latency_ms})
+                yield f"data: {final_evt}\n\n"
+            except Exception as exc:
+                logger.error("stream request_id=%s error=%s", request_id, exc)
+                err_evt = json.dumps({"error": str(exc), "done": True})
+                yield f"data: {err_evt}\n\n"
+
+class TestPromptRequest(BaseModel):
+    prompt: str = Field(..., min_length=1)
+    user_input: str = Field(default="")
+    model: str = Field(default="")
+
+
+@app.post("/test-prompt")
+async def test_prompt(req: TestPromptRequest, x_openrouter_key: str | None = Header(default=None)) -> dict[str, Any]:
+    request_id = str(uuid4())
+    started_at = time.perf_counter()
+    api_key = x_openrouter_key or OPENROUTER_API_KEY
+    if not api_key or api_key == "PASTE_YOUR_OPENROUTER_KEY_HERE":
+        raise HTTPException(status_code=503, detail="OpenRouter API key is not configured")
+
+    full_user_input = req.user_input.strip() if req.user_input.strip() else "Execute instructions."
+    text, model_name = await call_openrouter(full_user_input, req.prompt, request_id, custom_api_key=api_key)
+    latency_ms = int((time.perf_counter() - started_at) * 1000)
+
+    return {
+        "output": text,
+        "model": model_name,
+        "request_id": request_id,
+        "latency_ms": latency_ms,
+        "success": True,
+    }
 
 
 if __name__ == "__main__":

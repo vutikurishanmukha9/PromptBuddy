@@ -39,24 +39,25 @@ const renderMarkdown = (text) => {
       return;
     }
 
-    if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
-      const indent = line.search(/\S/);
-      const content = line.trim().slice(2);
-      elements.push(
-        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', paddingLeft: `${Math.max(0, indent) * 4}px`, margin: '0.125rem 0' }}>
-          <span className="list-dot" aria-hidden="true" />
-          <span className="prose-sm" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{inlineMd(content)}</span>
-        </div>
-      );
+    const trimmed = line.trim();
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      elements.push(<li key={i} className="prose-li">{inlineMd(line.slice(2))}</li>);
       return;
     }
 
-    const numMatch = line.trim().match(/^(\d+)\.\s(.*)/);
-    if (numMatch) {
+    const structMatch = trimmed.match(/^(ROLE|TASK|FORMAT|CONSTRAINTS|CONTEXT|GOAL|EXPECTATION|STEP \d+):/i);
+    if (structMatch) {
+      const tag = structMatch[1].toUpperCase();
+      let colorClass = 'structure-tag--generic';
+      if (tag.includes('ROLE')) colorClass = 'structure-tag--role';
+      else if (tag.includes('TASK') || tag.includes('GOAL')) colorClass = 'structure-tag--task';
+      else if (tag.includes('FORMAT')) colorClass = 'structure-tag--format';
+      else if (tag.includes('CONSTRAINT')) colorClass = 'structure-tag--constraints';
+
       elements.push(
-        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', margin: '0.125rem 0' }}>
-          <span style={{ color: 'rgb(var(--color-primary))', fontWeight: 600, fontSize: '0.8rem', minWidth: '1.25rem' }}>{numMatch[1]}.</span>
-          <span className="prose-sm" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{inlineMd(numMatch[2])}</span>
+        <div key={i} className={`structure-block ${colorClass}`}>
+          <span className="structure-tag">{tag}</span>
+          <span className="prose-sm" style={{ flex: 1 }}>{inlineMd(trimmed.slice(structMatch[0].length))}</span>
         </div>
       );
       return;
@@ -109,12 +110,52 @@ const PromptOutput = ({ result, intentOptions }) => {
   const [qualityScore, setQualityScore] = useState(null);
   const [previewMode, setPreviewMode] = useState('default');
 
+  const [playgroundInput, setPlaygroundInput] = useState('');
+  const [playgroundOutput, setPlaygroundOutput] = useState('');
+  const [isTesting, setIsTesting] = useState(false);
+  const [testError, setTestError] = useState('');
+
   const previewModes = [
     { value: 'default', label: 'Default' },
+    { value: 'diff', label: 'Diff View' },
+    { value: 'playground', label: 'Test Playground' },
     { value: 'chatgpt', label: 'ChatGPT' },
     { value: 'claude', label: 'Claude' },
     { value: 'raw', label: 'Raw' },
   ];
+
+  const handleRunTest = async () => {
+    if (!result?.optimized_prompt) return;
+    setIsTesting(true);
+    setTestError('');
+    setPlaygroundOutput('');
+
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${API_URL}/test-prompt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: result.optimized_prompt,
+          user_input: playgroundInput,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.detail || data.error || 'Test execution failed');
+      }
+
+      setPlaygroundOutput(data.output || 'No output generated');
+    } catch (err) {
+      setTestError(err.message || 'Failed to run test');
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
+  const estimatedTokens = Math.round((result?.optimized_prompt?.length || 0) / 4);
+  const estimatedCost = (estimatedTokens * 0.00000015).toFixed(5);
 
   useEffect(() => {
     if (result?.optimized_prompt) {
@@ -257,7 +298,7 @@ const PromptOutput = ({ result, intentOptions }) => {
           </div>
         </div>
 
-        {/* Optimized Prompt */}
+        {/* Optimized Prompt Header & Actions */}
         <div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '0.75rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -357,6 +398,54 @@ const PromptOutput = ({ result, intentOptions }) => {
             </div>
           )}
 
+          {previewMode === 'diff' && (
+            <div className="output-preview" style={{ padding: '1rem', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div style={{ background: 'rgba(239, 68, 68, 0.05)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                  <h5 style={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: 600, marginBottom: '0.5rem' }}>Raw Input</h5>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', whiteSpace: 'pre-wrap' }}>{result.original_prompt}</p>
+                </div>
+                <div style={{ background: 'rgba(16, 185, 129, 0.05)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                  <h5 style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600, marginBottom: '0.5rem' }}>Optimized Prompt</h5>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', whiteSpace: 'pre-wrap' }}>{result.optimized_prompt}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {previewMode === 'playground' && (
+            <div className="output-preview" style={{ padding: '1rem', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+              <h4 style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Test Playground</h4>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
+                Run this optimized prompt live against an LLM with optional test inputs.
+              </p>
+              <textarea
+                value={playgroundInput}
+                onChange={(e) => setPlaygroundInput(e.target.value)}
+                placeholder="Optional test variables or query content..."
+                style={{ width: '100%', padding: '0.5rem', fontSize: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', marginBottom: '0.75rem' }}
+                rows="3"
+              />
+              <button
+                onClick={handleRunTest}
+                disabled={isTesting}
+                className="btn-primary"
+                style={{ padding: '0.375rem 0.875rem', fontSize: '0.8rem' }}
+              >
+                {isTesting ? 'Executing LLM test...' : 'Run Test'}
+              </button>
+
+              {testError && <p style={{ color: 'red', fontSize: '0.75rem', marginTop: '0.5rem' }}>{testError}</p>}
+
+              {playgroundOutput && (
+                <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
+                  <h5 style={{ fontSize: '0.75rem', fontWeight: 600, color: 'rgb(var(--color-primary))', marginBottom: '0.375rem' }}>LLM Response:</h5>
+                  <pre style={{ fontSize: '0.8rem', color: 'var(--text-primary)', whiteSpace: 'pre-wrap', margin: 0 }}>{playgroundOutput}</pre>
+                </div>
+              )}
+            </div>
+          )}
+
           {previewMode === 'chatgpt' && (
             <div className="output-preview output-preview--chatgpt">
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
@@ -404,11 +493,9 @@ const PromptOutput = ({ result, intentOptions }) => {
             <div className="stat-card__unit" style={{ color: 'rgb(var(--color-primary))' }}>chars</div>
           </div>
           <div className="stat-card" style={{ borderColor: 'rgba(var(--color-success), 0.2)' }}>
-            <div className="stat-card__label" style={{ color: 'rgb(var(--color-success))' }}>Expand</div>
-            <div className="stat-card__value" style={{ color: 'rgb(var(--color-success))' }}>
-              {Math.round((result.optimized_prompt.length / result.original_prompt.length) * 100)}%
-            </div>
-            <div className="stat-card__unit" style={{ color: 'rgb(var(--color-success))' }}>growth</div>
+            <div className="stat-card__label" style={{ color: 'rgb(var(--color-success))' }}>Est. Tokens</div>
+            <div className="stat-card__value" style={{ color: 'rgb(var(--color-success))' }}>{estimatedTokens}</div>
+            <div className="stat-card__unit" style={{ color: 'rgb(var(--color-success))' }}>~${estimatedCost}</div>
           </div>
           {qualityScore && (
             <div className="stat-card">

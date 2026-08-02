@@ -1,10 +1,50 @@
-﻿node_modules/
-dist/
-build/
-.env
-venv/
-backend/venv/
+# Dependencies
+node_modules/
 frontend/node_modules/
+
+# Python Virtual Environments
+venv/
+.venv/
+backend/venv/
+backend/.venv/
+ENV/
+env/
+
+# Python Byte-compiled / cache files
 __pycache__/
+backend/__pycache__/
+*.pyc
+*.pyo
+*.pyd
 .pytest_cache/
+backend/.pytest_cache/
+.coverage
+htmlcov/
+
+# Build & Output Artifacts
+dist/
+frontend/dist/
+build/
+*.egg-info/
+
+# Environment Variables & Secrets
+.env
+*.env
+*.env.*
+!*.env.example
+
+# Logs & Temporary Files
+*.log
+*.tmp
+*.temp
+
+# OS & IDE Metadata
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Agent / Tooling Cache
 .agents/
+.hallmark/
