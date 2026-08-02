@@ -1,7 +1,7 @@
 /* Hallmark | macrostructure: Workbench Split | tone: quiet product | anchor hue: teal
  * Hallmark | pre-emit critique: P4 H4 E4 S4 R4 V4 | contrast: pass (46-50) | mobile: pass (36, 59, 61-69)
  */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -12,6 +12,11 @@
    ============================================ */
 
 :root {
+  /* Typography Tokens */
+  --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
   /* Colors */
   --color-primary: 15 118 110;
   --color-primary-light: 20 184 166;
@@ -112,10 +117,22 @@ body {
   background: var(--surface-bg);
   color: var(--text-primary);
   min-height: 100vh;
+  line-height: 1.5;
   transition: background var(--dur-medium) var(--ease-out), color var(--dur-medium) var(--ease-out);
 }
 
-code {
+h1, h2, h3, h4, h5, h6, .workspace-title, .modal-header__title, .section-heading h2 {
+  font-family: var(--font-display);
+  letter-spacing: -0.022em;
+}
+
+.section-kicker, .eyebrow, .preset-card__type, .structure-tag, .kbd {
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+code, textarea, .prompt-textarea, pre {
   font-family: var(--font-mono);
 }
 
