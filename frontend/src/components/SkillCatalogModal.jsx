@@ -611,7 +611,7 @@ const SkillCatalogModal = ({ isOpen, onClose, onImportSkill }) => {
                       </span>
                     </div>
                     <span style={{ fontSize: '0.675rem', color: 'var(--ink-muted)' }}>
-                      {isLoadingDetail ? 'Loading spec...' : 'FastAPI Loaded'}
+                      {isLoadingDetail ? 'Loading spec...' : 'Spec Loaded'}
                     </span>
                   </div>
 

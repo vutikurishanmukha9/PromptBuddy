@@ -1,5 +1,5 @@
 // PromptBuddy Enterprise API Client
-// Connects frontend workbench directly to FastAPI backend engines
+// Connects frontend workbench directly to backend engines
 
 const getApiBaseUrl = () => {
   if (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_API_URL) {

@@ -3,7 +3,6 @@ import PromptGenerator from './components/PromptGenerator';
 import ShortcutsHelp from './components/ShortcutsHelp';
 import CommandPalette from './components/CommandPalette';
 import SkillCatalogModal from './components/SkillCatalogModal';
-import { checkBackendHealth } from './utils/api';
 import { SlidersHorizontal, FolderArchive, Command, HelpCircle, Boxes } from 'lucide-react';
 import './index.css';
 
@@ -11,30 +10,7 @@ function App() {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [showSkillCatalog, setShowSkillCatalog] = useState(false);
-  const [backendStatus, setBackendStatus] = useState('checking'); // 'connected' | 'offline' | 'checking'
   const [externalCommand, setExternalCommand] = useState(null);
-
-  useEffect(() => {
-    let isMounted = true;
-    async function checkHealth() {
-      try {
-        const res = await checkBackendHealth();
-        if (isMounted && res && res.status === 'ok') {
-          setBackendStatus('connected');
-        } else if (isMounted) {
-          setBackendStatus('offline');
-        }
-      } catch {
-        if (isMounted) setBackendStatus('offline');
-      }
-    }
-    checkHealth();
-    const interval = setInterval(checkHealth, 30000);
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    };
-  }, []);
 
   const handleKeyDown = useCallback((e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
@@ -73,30 +49,6 @@ function App() {
                 <span className="card-badge" style={{ fontSize: '0.625rem', letterSpacing: '0.04em' }}>STUDIO</span>
               </div>
               <span className="brand-tagline">Enterprise Prompt Engineering &amp; Optimization</span>
-            </div>
-          </div>
-
-          {/* Status Telemetry */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="hidden sm:flex">
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.375rem',
-              padding: '0.25rem 0.625rem',
-              borderRadius: 'var(--radius-full)',
-              background: 'var(--surface-subtle)',
-              border: '1px solid var(--hairline)',
-              fontSize: '0.725rem',
-              color: 'var(--ink-secondary)',
-              fontVariantNumeric: 'tabular-nums'
-            }}>
-              <span style={{
-                width: '0.45rem',
-                height: '0.45rem',
-                borderRadius: '50%',
-                background: backendStatus === 'connected' ? 'var(--semantic-success)' : backendStatus === 'offline' ? 'var(--semantic-warning)' : 'var(--ink-muted)'
-              }} />
-              <span>{backendStatus === 'connected' ? 'FastAPI Engine Live' : backendStatus === 'offline' ? 'Offline Fallback Active' : 'Connecting Engine...'}</span>
             </div>
           </div>
 

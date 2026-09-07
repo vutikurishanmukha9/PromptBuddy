@@ -1803,7 +1803,7 @@ print(response.choices[0].message.content)`;
                     style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}
                   >
                     <RefreshCw className={`w-3 h-3 ${isCompilingGuidance ? 'animate-spin' : ''}`} />
-                    <span>{isCompilingGuidance ? 'Compiling...' : 'Recompile with FastAPI'}</span>
+                    <span>{isCompilingGuidance ? 'Compiling...' : 'Recompile'}</span>
                   </button>
                   <button
                     type="button"
@@ -1836,7 +1836,7 @@ print(response.choices[0].message.content)`;
                     style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}
                   >
                     <RefreshCw className={`w-3 h-3 ${isCompilingGrammar ? 'animate-spin' : ''}`} />
-                    <span>{isCompilingGrammar ? 'Compiling...' : 'Recompile with FastAPI'}</span>
+                    <span>{isCompilingGrammar ? 'Compiling...' : 'Recompile'}</span>
                   </button>
                   <button
                     type="button"

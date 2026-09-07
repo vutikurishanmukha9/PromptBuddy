@@ -33,7 +33,7 @@ const examplePrompts = [
 
 const exampleSkillPrompts = [
   'Create a Next.js 15 App Router architecture auditor skill that validates server actions, client boundaries, and streaming boundaries',
-  'Architect a FastAPI production testing skill that generates pytest test suites with async fixtures and 100% branch coverage',
+  'Architect a Python backend production testing skill that generates pytest test suites with async fixtures and 100% branch coverage',
   'Build an automated security code reviewer skill that scans git diffs for injection flaws, auth leakage, and missing sanitization',
   'Design a PostgreSQL migration skill that verifies zero-downtime schema changes, index safety, and rollback procedures',
 ];
