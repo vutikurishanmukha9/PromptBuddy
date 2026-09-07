@@ -1,6 +1,11 @@
+# ==============================================================================
+# PromptBuddy Enterprise .gitignore
+# ==============================================================================
+
 # Dependencies
 node_modules/
 frontend/node_modules/
+.pnpm-store/
 
 # Python Virtual Environments
 venv/
@@ -9,42 +14,96 @@ backend/venv/
 backend/.venv/
 ENV/
 env/
+env.bak/
+venv.bak/
 
-# Python Byte-compiled / cache files
+# Python Byte-compiled / Cache files
 __pycache__/
 backend/__pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Testing & Coverage Artifacts
 .pytest_cache/
 backend/.pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
+.tox/
+.nox/
+.hypothesis/
+coverage.xml
+*.cover
 
-# Build & Output Artifacts
+# Python Packaging & Distribution
 dist/
 frontend/dist/
 build/
 *.egg-info/
+.eggs/
+*.egg
+MANIFEST
+develop-eggs/
+downloads/
+eggs/
+.installed.cfg
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+
+# Frontend / Vite / Vercel Build Artifacts
+.vite/
+frontend/.vite/
+.vercel/
+frontend/.vercel/
+*.tsbuildinfo
 
 # Environment Variables & Secrets
 .env
-*.env
-*.env.*
+.env.*
+backend/.env
+backend/.env.*
+frontend/.env
+frontend/.env.*
 !*.env.example
+!frontend/.env.example
+!backend/.env.example
 
-# Logs & Temporary Files
+# Logs, Dumps & Temp Files
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 *.tmp
 *.temp
+*.bak
 
-# OS & IDE Metadata
+# Docker Overrides
+docker-compose.override.yml
+
+# IDE, OS & System Metadata
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+Desktop.ini
 .vscode/
 .idea/
+*.sublime-project
+*.sublime-workspace
 *.swp
+*.swo
 
-# Agent / Tooling Cache
+# AI Agents & IDE Tooling Internal Cache
 .agents/
 .hallmark/

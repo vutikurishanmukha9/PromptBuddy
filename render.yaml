@@ -1,12 +1,42 @@
 services:
+  # ----------------------------------------------------------------------------
+  # FastAPI Backend Engine (REST, Streaming, Verification Matrices, Compilers)
+  # ----------------------------------------------------------------------------
   - type: web
     name: promptbuddy-api
-    env: python
+    runtime: python
+    rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
-    rootDir: backend
+    healthCheckPath: /health
+    autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.6
       - key: OPENROUTER_API_KEY
         sync: false
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: LOG_LEVEL
+        value: INFO
+
+  # ----------------------------------------------------------------------------
+  # React + Vite Frontend Studio Workbench (Static Site)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: promptbuddy-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    autoDeploy: true
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: promptbuddy-api
+          property: host

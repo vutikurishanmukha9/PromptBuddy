@@ -1,17 +1,17 @@
-/* Hallmark | tokens: PromptBuddy workbench | tone: product-grade | anchor hue: teal */
+/* Enterprise Design Tokens | PromptBuddy Studio | Tone: quiet craft | Anchor: carbon monochrome */
 :root {
-  --color-paper: oklch(97% 0.01 250);
-  --color-paper-2: oklch(94% 0.014 245);
-  --color-ink: oklch(23% 0.045 250);
-  --color-ink-2: oklch(42% 0.04 245);
-  --color-rule: oklch(87% 0.02 245);
-  --color-accent-token: oklch(46% 0.09 190);
-  --color-accent-ink: oklch(99% 0.005 190);
-  --color-focus: oklch(57% 0.11 190);
+  --color-paper: #fafafa;
+  --color-paper-2: #f4f4f5;
+  --color-ink: #09090b;
+  --color-ink-2: #52525b;
+  --color-rule: #e4e4e7;
+  --color-accent-token: #18181b;
+  --color-accent-ink: #ffffff;
+  --color-focus: #18181b;
 
-  --font-display: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-body: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", source-code-pro, Menlo, Monaco, Consolas, monospace;
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
   --space-3xs: 0.25rem;
   --space-2xs: 0.5rem;
@@ -23,18 +23,18 @@
   --space-2xl: 4.5rem;
 
   --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-md: 1rem;
-  --text-lg: 1.25rem;
-  --text-xl: 1.75rem;
-  --text-display: clamp(1.9rem, 4vw, 2.75rem);
+  --text-sm: 0.8125rem;
+  --text-md: 0.875rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-display: clamp(1.75rem, 3vw, 2.25rem);
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --dur-short: 180ms;
-  --dur-medium: 260ms;
+  --dur-short: 120ms;
+  --dur-medium: 180ms;
   --rule-thin: 1px;
-  --radius-card: 10px;
-  --radius-input: 10px;
-  --radius-pill: 999px;
+  --radius-card: 8px;
+  --radius-input: 6px;
+  --radius-pill: 9999px;
 }

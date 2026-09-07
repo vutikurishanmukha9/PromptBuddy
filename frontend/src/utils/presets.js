@@ -205,6 +205,48 @@ export const industryPresets = {
             },
         ],
     },
+    agentSkills: {
+        label: 'AI IDE Agent Skills',
+        icon: 'cpu',
+        description: 'Production-grade SKILL.md templates for AI coding agents',
+        presets: [
+            {
+                id: 'code_review_skill',
+                name: 'Code Reviewer & Vulnerability Scanner',
+                promptType: 'agent_skill',
+                basePrompt: 'Build an AI agent skill that performs comprehensive code review including security vulnerability detection (OWASP Top 10), memory leak identification, performance bottleneck analysis, and clean code adherence checks across any programming language.',
+                description: 'Automated code audit with security, performance & style checks',
+            },
+            {
+                id: 'db_migration_skill',
+                name: 'Zero-Downtime Database Migration',
+                promptType: 'agent_skill',
+                basePrompt: 'Build an AI agent skill that plans and executes zero-downtime database migrations. It should analyze current schema, generate forward and rollback migration scripts, validate data integrity, and execute with blue-green deployment strategy.',
+                description: 'Safe schema migrations with rollback and validation',
+            },
+            {
+                id: 'nextjs_auditor_skill',
+                name: 'Next.js Performance Auditor',
+                promptType: 'agent_skill',
+                basePrompt: 'Build an AI agent skill that audits a Next.js 15 application for performance issues including bundle size analysis, React Server Components optimization, streaming SSR configuration, image optimization, and Core Web Vitals improvement recommendations.',
+                description: 'Next.js 15 RSC, bundle, and CWV optimization audit',
+            },
+            {
+                id: 'e2e_test_skill',
+                name: 'Playwright E2E & Visual Regression',
+                promptType: 'agent_skill',
+                basePrompt: 'Build an AI agent skill that generates and maintains Playwright end-to-end tests including visual regression snapshots, accessibility checks (axe-core), cross-browser validation, and flaky test detection with automatic retry strategies.',
+                description: 'End-to-end testing with visual regression and a11y',
+            },
+            {
+                id: 'ci_cd_skill',
+                name: 'CI/CD Pipeline Reliability Agent',
+                promptType: 'agent_skill',
+                basePrompt: 'Build an AI agent skill that analyzes CI/CD pipeline configurations (GitHub Actions, GitLab CI, CircleCI) for reliability issues, identifies slow stages, suggests parallelization, validates secret management, and generates optimized pipeline definitions.',
+                description: 'Pipeline optimization, secret validation & parallelization',
+            },
+        ],
+    },
 };
 
 export const getAllPresets = () => {

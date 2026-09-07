@@ -51,6 +51,13 @@ export const frameworkCategories = {
             { value: '5w1h', label: '5W1H', desc: 'Who, What, When, Where, Why, How' },
         ],
     },
+    agentic: {
+        key: 'agentic',
+        label: 'AI IDE & Agent Skills',
+        types: [
+            { value: 'agent_skill', label: 'Agent SKILL.md', desc: 'Standardized SKILL.md specification for AI IDEs (Antigravity, Cursor, Claude Code)' },
+        ],
+    },
 };
 
 export const frameworkOptions = Object.values(frameworkCategories).flatMap(category => category.types);

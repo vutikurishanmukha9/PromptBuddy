@@ -71,6 +71,8 @@ export const savePrompt = (prompt) => {
         p.optimizedPrompt === prompt.optimizedPrompt
     );
 
+    const existingVersions = duplicateIndex >= 0 ? (prompts[duplicateIndex].versions || []) : [];
+
     const newPrompt = {
         id: duplicateIndex >= 0 ? prompts[duplicateIndex].id : createId(),
         title: prompt.title || `Prompt ${prompts.length + 1}`,
@@ -81,6 +83,16 @@ export const savePrompt = (prompt) => {
         tags: prompt.tags || [],
         createdAt: duplicateIndex >= 0 ? prompts[duplicateIndex].createdAt : new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        // Versioning fields (Langfuse-inspired)
+        version: prompt.version || '1.0.0',
+        releaseTag: prompt.releaseTag || 'draft',
+        versions: existingVersions.length > 0 ? existingVersions : [{
+            version: '1.0.0',
+            prompt: prompt.optimizedPrompt,
+            timestamp: new Date().toISOString(),
+            note: 'Initial version',
+        }],
+        activeVersion: prompt.version || '1.0.0',
     };
 
     const nextPrompts = duplicateIndex >= 0
@@ -100,6 +112,50 @@ export const updatePrompt = (id, updates) => {
     );
     writeJSON(STORAGE_KEYS.SAVED_PROMPTS, prompts);
     return prompts.find(p => p.id === id);
+};
+
+export const createVersion = (id, note = '') => {
+    const prompts = getSavedPrompts();
+    const prompt = prompts.find(p => p.id === id);
+    if (!prompt) return null;
+
+    const versions = prompt.versions || [];
+    const lastVersion = versions.length > 0 ? versions[versions.length - 1].version : '0.0.0';
+    const parts = lastVersion.split('.').map(Number);
+    parts[2] = (parts[2] || 0) + 1;
+    const newVersion = parts.join('.');
+
+    const newEntry = {
+        version: newVersion,
+        prompt: prompt.optimizedPrompt,
+        timestamp: new Date().toISOString(),
+        note: note || `Version ${newVersion}`,
+    };
+
+    return updatePrompt(id, {
+        version: newVersion,
+        activeVersion: newVersion,
+        versions: [...versions, newEntry],
+    });
+};
+
+export const setReleaseTag = (id, tag) => {
+    if (!['production', 'staging', 'draft'].includes(tag)) return null;
+    return updatePrompt(id, { releaseTag: tag });
+};
+
+export const restoreVersion = (id, targetVersion) => {
+    const prompts = getSavedPrompts();
+    const prompt = prompts.find(p => p.id === id);
+    if (!prompt) return null;
+
+    const entry = (prompt.versions || []).find(v => v.version === targetVersion);
+    if (!entry) return null;
+
+    return updatePrompt(id, {
+        optimizedPrompt: entry.prompt,
+        activeVersion: targetVersion,
+    });
 };
 
 export const getPromptHistory = () => readJSON(STORAGE_KEYS.PROMPT_HISTORY, []);

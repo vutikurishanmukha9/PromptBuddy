@@ -1,28 +1,40 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PromptGenerator from './components/PromptGenerator';
-import ThemeToggle from './components/ThemeToggle';
 import ShortcutsHelp from './components/ShortcutsHelp';
 import CommandPalette from './components/CommandPalette';
-import { getTheme, setTheme as persistTheme } from './utils/storage';
+import SkillCatalogModal from './components/SkillCatalogModal';
+import { checkBackendHealth } from './utils/api';
+import { SlidersHorizontal, FolderArchive, Command, HelpCircle, Boxes } from 'lucide-react';
 import './index.css';
 
 function App() {
-  const [theme, setTheme] = useState('light');
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
+  const [showSkillCatalog, setShowSkillCatalog] = useState(false);
+  const [backendStatus, setBackendStatus] = useState('checking'); // 'connected' | 'offline' | 'checking'
   const [externalCommand, setExternalCommand] = useState(null);
 
   useEffect(() => {
-    const savedTheme = getTheme();
-    setTheme(savedTheme);
-    document.documentElement.setAttribute('data-theme', savedTheme);
+    let isMounted = true;
+    async function checkHealth() {
+      try {
+        const res = await checkBackendHealth();
+        if (isMounted && res && res.status === 'ok') {
+          setBackendStatus('connected');
+        } else if (isMounted) {
+          setBackendStatus('offline');
+        }
+      } catch {
+        if (isMounted) setBackendStatus('offline');
+      }
+    }
+    checkHealth();
+    const interval = setInterval(checkHealth, 30000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, []);
-
-  const toggleTheme = useCallback(() => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    persistTheme(newTheme);
-  }, [theme]);
 
   const handleKeyDown = useCallback((e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
@@ -33,15 +45,12 @@ function App() {
       e.preventDefault();
       setShowShortcuts(prev => !prev);
     }
-    if (e.ctrlKey && e.key === 'd') {
-      e.preventDefault();
-      toggleTheme();
-    }
     if (e.key === 'Escape') {
       setShowShortcuts(false);
       setShowCommandPalette(false);
+      setShowSkillCatalog(false);
     }
-  }, [toggleTheme]);
+  }, []);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -49,85 +58,154 @@ function App() {
   }, [handleKeyDown]);
 
   return (
-    <div className="App">
-      {/* Header */}
-      <header className="app-header">
-        <div className="app-header__inner">
-          <div className="app-header__brand animate-slideIn">
-            <div className="app-header__logo">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
+    <div className="app-shell">
+      {/* Enterprise Top Navigation Bar */}
+      <header className="top-navbar">
+        <div className="top-navbar__inner">
+          {/* Brand Monogram & Identity */}
+          <div className="brand-badge">
+            <div className="brand-icon-box" aria-hidden="true">
+              [&gt;]
             </div>
-            <div>
-              <div className="app-header__title">PromptBuddy</div>
-              <div className="app-header__subtitle">AI-Powered Prompt Optimizer</div>
+            <div className="brand-info">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span className="brand-name">PromptBuddy</span>
+                <span className="card-badge" style={{ fontSize: '0.625rem', letterSpacing: '0.04em' }}>STUDIO</span>
+              </div>
+              <span className="brand-tagline">Enterprise Prompt Engineering &amp; Optimization</span>
             </div>
           </div>
 
-          <div className="app-header__context" aria-label="Workspace status">
-            <span>Personal workspace</span>
-            <span>Drafts saved locally</span>
+          {/* Status Telemetry */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="hidden sm:flex">
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.375rem',
+              padding: '0.25rem 0.625rem',
+              borderRadius: 'var(--radius-full)',
+              background: 'var(--surface-subtle)',
+              border: '1px solid var(--hairline)',
+              fontSize: '0.725rem',
+              color: 'var(--ink-secondary)',
+              fontVariantNumeric: 'tabular-nums'
+            }}>
+              <span style={{
+                width: '0.45rem',
+                height: '0.45rem',
+                borderRadius: '50%',
+                background: backendStatus === 'connected' ? 'var(--semantic-success)' : backendStatus === 'offline' ? 'var(--semantic-warning)' : 'var(--ink-muted)'
+              }} />
+              <span>{backendStatus === 'connected' ? 'FastAPI Engine Live' : backendStatus === 'offline' ? 'Offline Fallback Active' : 'Connecting Engine...'}</span>
+            </div>
           </div>
 
-          <div className="app-header__actions animate-fadeIn">
+          {/* Quick Action Controls */}
+          <div className="nav-actions">
             <button
+              type="button"
+              onClick={() => setShowSkillCatalog(true)}
+              className="btn btn-secondary btn-sm"
+              title="Browse 132 enterprise agent skills specification catalog"
+            >
+              <Boxes className="w-3.5 h-3.5" />
+              <span className="nav-btn-text">Agent Skills (132)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setExternalCommand({ type: 'open_presets' })}
+              className="btn btn-secondary btn-sm"
+              title="Browse industry prompt presets"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span className="nav-btn-text">Presets</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setExternalCommand({ type: 'open_library' })}
+              className="btn btn-secondary btn-sm"
+              title="Saved prompt library"
+            >
+              <FolderArchive className="w-3.5 h-3.5" />
+              <span className="nav-btn-text">Library</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => setShowCommandPalette(true)}
-              className="btn-secondary"
-              title="Command Palette (Ctrl+K)"
-              style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}
+              className="btn btn-secondary btn-sm"
+              title="Global command palette (Ctrl+K)"
             >
-              <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <span>Commands</span>
-              <span className="kbd">Ctrl+K</span>
+              <Command className="w-3.5 h-3.5" />
+              <span className="kbd">Ctrl K</span>
             </button>
 
             <button
+              type="button"
               onClick={() => setShowShortcuts(true)}
-              className="btn-secondary"
+              className="btn btn-ghost btn-icon"
               title="Keyboard shortcuts (Ctrl+/)"
-              style={{ padding: '0.5rem' }}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707" />
-              </svg>
+              <HelpCircle className="w-4 h-4 text-zinc-500" />
             </button>
-
-            <ThemeToggle theme={theme} setTheme={setTheme} />
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="app-main animate-fadeIn">
+      {/* Main Studio Workbench Area */}
+      <main className="workbench-container">
         <PromptGenerator externalCommand={externalCommand} />
       </main>
 
-      {/* Footer */}
-      <footer className="app-footer">
-        <div className="app-footer__inner">
-          <p className="app-footer__text">
-            (c) 2026 <span className="app-footer__brand">PromptBuddy</span>. Crafted for AI.
-          </p>
-          <span className="app-footer__shortcuts">
-            Press <span className="kbd">Ctrl</span> + <span className="kbd">K</span> for commands
-          </span>
+      {/* Enterprise Footer */}
+      <footer style={{
+        borderTop: '1px solid var(--hairline)',
+        background: '#ffffff',
+        padding: '1rem 1.25rem',
+        marginTop: 'auto'
+      }}>
+        <div style={{
+          maxHeight: '90rem',
+          margin: '0 auto',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          fontSize: '0.75rem',
+          color: 'var(--ink-muted)'
+        }}>
+          <div>
+            <span>PromptBuddy Studio</span> &bull; <span>Enterprise AI Optimization Engine</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+            <span>132 Enterprise Agent Skills</span>
+            <span>22 Industrial Frameworks</span>
+            <span>Zero-Retention Workspace</span>
+            <span>Version 4.2</span>
+          </div>
         </div>
       </footer>
 
-      {/* Shortcuts Help Modal */}
+      {/* Global Modals */}
       <ShortcutsHelp isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
-
-      {/* Command Palette Modal */}
       <CommandPalette
         isOpen={showCommandPalette}
         onClose={() => setShowCommandPalette(false)}
         onSelectFramework={(fw) => setExternalCommand({ type: 'framework', value: fw })}
         onSelectPreset={(pr) => setExternalCommand({ type: 'preset', value: pr })}
-        onToggleTheme={toggleTheme}
+        onToggleTheme={() => {}}
         onOpenLibrary={() => setExternalCommand({ type: 'open_library' })}
+        onOpenSkills={() => setShowSkillCatalog(true)}
+      />
+      <SkillCatalogModal
+        isOpen={showSkillCatalog}
+        onClose={() => setShowSkillCatalog(false)}
+        onImportSkill={(imported) => {
+          setExternalCommand({ type: 'import_skill', value: imported });
+        }}
       />
     </div>
   );
