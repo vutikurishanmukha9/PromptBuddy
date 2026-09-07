@@ -70,6 +70,7 @@ async def get_catalog_categories() -> List[SkillCategorySummary]:
 
 
 @router.get("/catalog/{category}/{skill_name}", response_model=SkillDetailResponse)
+@router.get("/{category}/{skill_name}", response_model=SkillDetailResponse)
 async def get_catalog_skill_detail(category: str, skill_name: str) -> SkillDetailResponse:
     """Retrieve full detail, instructions, and safety tier for an enterprise skill."""
     try:

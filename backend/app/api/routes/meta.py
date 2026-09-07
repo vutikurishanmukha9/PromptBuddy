@@ -81,6 +81,7 @@ from app.engines.observability_engine import get_traces, get_trace
 
 
 @router.get("/telemetry/traces", response_model=TraceListResponse, tags=["Observability"])
+@router.get("/observability/traces", response_model=TraceListResponse, tags=["Observability"])
 async def list_telemetry_traces(
     model: Optional[str] = Query(None, description="Filter by model"),
     status: Optional[str] = Query(None, description="Filter by status (success/error)"),
@@ -93,6 +94,7 @@ async def list_telemetry_traces(
 
 
 @router.get("/telemetry/traces/{trace_id}", response_model=TraceRecord, tags=["Observability"])
+@router.get("/observability/traces/{trace_id}", response_model=TraceRecord, tags=["Observability"])
 async def get_telemetry_trace_detail(trace_id: str) -> TraceRecord:
     """Retrieve detailed execution trace with step-level telemetry."""
     trace = get_trace(trace_id)
