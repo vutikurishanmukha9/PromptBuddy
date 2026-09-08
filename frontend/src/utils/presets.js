@@ -35,6 +35,27 @@ export const industryPresets = {
                 basePrompt: 'Design a production-ready REST API spec with endpoints, HTTP methods, JSON request/response bodies, and status codes.',
                 description: 'API endpoint spec with request & response schemas',
             },
+            {
+                id: 'karpathy_clean_code',
+                name: 'Karpathy Clean Code (Anti-AI-Slop)',
+                promptType: 'clear',
+                basePrompt: 'Write clean, surgical code adhering to Andrej Karpathy guidelines: 1) Think before coding (state assumptions explicitly, surface tradeoffs, ask when ambiguous). 2) Simplicity first (minimum code that solves the problem, no speculative abstractions). 3) Surgical changes (touch only what is necessary, match existing style, clean only orphaned code). 4) Goal-driven execution (define verifiable tests and criteria).',
+                description: 'Enforce Andrej Karpathy anti-bloat, surgical coding principles for high-signal output',
+            },
+            {
+                id: 'define_goal',
+                name: 'Measurable Goal & Spec Definer',
+                promptType: 'smart',
+                basePrompt: 'Shape this fuzzy requirement into a concrete, measurable goal before starting work. State: 1) What concrete outcome will be true. 2) Binary or quantitative success thresholds (exact test commands, error rates, p95 latencies, or artifact constraints). 3) In-scope vs out-of-scope boundaries. 4) Verification evidence. 5) Clear stop conditions.',
+                description: 'Sharpen fuzzy intentions into quantitative, verifiable objectives with explicit pass/fail criteria',
+            },
+            {
+                id: 'threat_modeling',
+                name: 'AppSec Threat Modeling',
+                promptType: 'clear',
+                basePrompt: 'Perform a repository-grounded AppSec threat model. Enumerate primary data flows, trust boundaries, attacker capabilities, and realistic abuse paths. Prioritize threats by likelihood x impact and recommend evidence-based mitigations with a compact Mermaid architecture diagram.',
+                description: 'Evidence-grounded threat modeling with trust boundaries, abuse paths, and mitigations',
+            },
         ],
     },
     marketing: {

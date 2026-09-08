@@ -140,7 +140,7 @@ def _build_catalog_index() -> Dict[str, Any]:
         name = item.get("name", "unnamed-skill")
         description = item.get("description", "")
         entrypoint = item.get("entrypoint", "")
-        category = _extract_category_from_entrypoint(entrypoint)
+        category = item.get("category") or _extract_category_from_entrypoint(entrypoint)
 
         # Extract safety tier
         safety_tier = _classify_safety_tier(description)
@@ -221,7 +221,7 @@ def list_catalog_skills(
 
     total = len(filtered)
     page = max(1, page)
-    limit = max(1, min(limit, 200))
+    limit = max(1, min(limit, 500))
     start_idx = (page - 1) * limit
     end_idx = start_idx + limit
     paginated_items = filtered[start_idx:end_idx]
@@ -252,10 +252,12 @@ def get_catalog_skill(category: str, skill_name: str) -> SkillDetailResponse:
     name = raw_item.get("name", skill_name)
     description = raw_item.get("description", "")
     entrypoint = raw_item.get("entrypoint", "")
-    inferred_category = _extract_category_from_entrypoint(entrypoint) or category
+    inferred_category = raw_item.get("category") or _extract_category_from_entrypoint(entrypoint) or category
 
     # Attempt to read local SKILL.md
     local_skill_path = SPEC_DIR / "skills" / inferred_category / name / "SKILL.md"
+    if not local_skill_path.exists():
+        local_skill_path = SPEC_DIR / "skills" / category / name / "SKILL.md"
     markdown_content = ""
 
     if local_skill_path.exists():

@@ -21,9 +21,9 @@ const CommandPalette = ({ isOpen, onClose, onSelectFramework, onSelectPreset, on
 
   const actions = [
     {
-      id: 'act_skills',
+      id: 'action-skills',
       type: 'action',
-      name: 'Browse 132 Enterprise Agent Skills Catalog',
+      name: 'Browse 454 Enterprise Agent Skills Catalog',
       desc: 'Explore cloud, ads, developers, analytics, and identity blueprints',
       action: onOpenSkills,
       icon: <Boxes className="w-4 h-4 text-zinc-600" />

@@ -107,3 +107,8 @@ Desktop.ini
 # AI Agents & IDE Tooling Internal Cache
 .agents/
 .hallmark/
+
+# Cloned Reference Repositories
+/ECC/
+/andrej-karpathy-skills/
+/skills/

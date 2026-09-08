@@ -57,7 +57,7 @@ async def get_skills_catalog(
     category: Optional[str] = Query(None, description="Category filter (e.g. cloud, ads, developers)"),
     query: Optional[str] = Query(None, description="Keyword search query"),
     page: int = Query(1, ge=1, description="Page number"),
-    limit: int = Query(50, ge=1, le=200, description="Items per page"),
+    limit: int = Query(50, ge=1, le=500, description="Items per page"),
 ) -> SkillCatalogResponse:
     """Retrieve indexed agent skills from the standard catalog with search and pagination."""
     return list_catalog_skills(category=category, query=query, page=page, limit=limit)

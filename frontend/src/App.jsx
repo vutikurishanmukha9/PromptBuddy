@@ -58,10 +58,10 @@ function App() {
               type="button"
               onClick={() => setShowSkillCatalog(true)}
               className="btn btn-secondary btn-sm"
-              title="Browse 132 enterprise agent skills specification catalog"
+              title="Browse 454 enterprise agent skills specification catalog"
             >
               <Boxes className="w-3.5 h-3.5" />
-              <span className="nav-btn-text">Agent Skills (132)</span>
+              <span className="nav-btn-text">Agent Skills (454)</span>
             </button>
 
             <button
@@ -133,7 +133,7 @@ function App() {
             <span>PromptBuddy Studio</span> &bull; <span>Enterprise AI Optimization Engine</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-            <span>132 Enterprise Agent Skills</span>
+            <span>454 Enterprise Agent Skills</span>
             <span>22 Industrial Frameworks</span>
             <span>Zero-Retention Workspace</span>
             <span>Version 4.2</span>

@@ -22,11 +22,21 @@ import {
 
 const CATEGORIES = [
   { id: 'all', label: 'All Domains' },
+  { id: 'documents', label: 'Documents & Office' },
+  { id: 'agentic', label: 'Agentic & Autonomous' },
+  { id: 'backend', label: 'Backend & APIs' },
+  { id: 'frontend', label: 'Frontend & UI' },
   { id: 'cloud', label: 'Cloud & Infra' },
-  { id: 'developers', label: 'Developers & Code' },
+  { id: 'devops', label: 'DevOps & Systems' },
+  { id: 'security', label: 'Security & Compliance' },
+  { id: 'testing', label: 'Testing & QA' },
+  { id: 'data-ai', label: 'Data & AI/ML' },
+  { id: 'mobile', label: 'Mobile & Apps' },
+  { id: 'workflow', label: 'Product & Workflow' },
+  { id: 'developers', label: 'Developer Tools' },
+  { id: 'ads', label: 'Ads & Campaigns' },
   { id: 'analytics', label: 'Analytics & BI' },
   { id: 'identity', label: 'Identity & Auth' },
-  { id: 'ads', label: 'Ads & Campaigns' },
 ];
 
 const getSafetyTierBadge = (tier) => {
@@ -89,7 +99,7 @@ const SkillCatalogModal = ({ isOpen, onClose, onImportSkill }) => {
       const data = await fetchSkillsCatalog({
         category,
         query: searchQuery.trim(),
-        limit: 150,
+        limit: 500,
       });
       setSkills(data.skills || []);
       setTotalCount(data.total || (data.skills ? data.skills.length : 0));
