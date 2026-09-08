@@ -164,6 +164,7 @@ const SkillCatalogModal = ({ isOpen, onClose, onImportSkill }) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isOpen) {
+        e.preventDefault();
         onClose();
       }
     };

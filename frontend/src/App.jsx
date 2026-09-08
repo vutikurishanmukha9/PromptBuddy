@@ -25,6 +25,7 @@ function App() {
       setShowShortcuts(false);
       setShowCommandPalette(false);
       setShowSkillCatalog(false);
+      setExternalCommand({ type: 'close_modals' });
     }
   }, []);
 

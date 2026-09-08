@@ -86,6 +86,19 @@ const CommandPalette = ({ isOpen, onClose, onSelectFramework, onSelectPreset, on
     setSelectedIndex(0);
   }, [query]);
 
+  // Global Escape key listener when palette is open
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleWindowKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleWindowKeyDown);
+    return () => window.removeEventListener('keydown', handleWindowKeyDown);
+  }, [isOpen, onClose]);
+
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -100,6 +113,7 @@ const CommandPalette = ({ isOpen, onClose, onSelectFramework, onSelectPreset, on
         onClose();
       }
     } else if (e.key === 'Escape') {
+      e.preventDefault();
       onClose();
     }
   };

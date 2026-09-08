@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { industryPresets, getAllPresets } from '../utils/presets';
 import {
   Code2,
@@ -37,6 +37,18 @@ const PresetSelector = ({ onSelectPreset, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const allPresetsList = useMemo(() => getAllPresets(), []);
+
+  // Handle escape key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   const handleSelectPreset = (preset) => {
     onSelectPreset(preset);

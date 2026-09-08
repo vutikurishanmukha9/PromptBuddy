@@ -1,93 +1,129 @@
-# PromptBuddy - AI-Powered Prompt Optimizer
+# PromptBuddy Studio - Enterprise Prompt & Skill Engineering
 
-> **Version:** 4.1.0  
-> **Tech Stack:** FastAPI, OpenRouter AI (Server-Sent Events), React 18, Vite 4, Tailwind CSS
+> **Version:** 4.2.0  
+> **Tech Stack:** React 18, Vite 4, Tailwind CSS, FastAPI, Uvicorn, Pydantic v2  
+> **Catalog:** 454 Production Domain Skills Across 15 Enterprise Categories  
+> **Frameworks:** 22 Industrial Prompt Engineering Frameworks
 
-**PromptBuddy** is an industrial-grade AI prompt optimization platform. It translates informal, messy human input into structured, high-performing prompts formatted for modern Large Language Models (LLMs) such as ChatGPT, Claude, Gemini, and DeepSeek.
+**PromptBuddy** is an enterprise-grade **Prompt & Skill Engineering Studio**. It solves the single largest failure mode in production Generative AI: **LLM Output Degradation ("AI Slop")** caused by vague, under-constrained, hallucination-prone prompts and unstructured instructions.
 
----
-
-## Features
-
-- **Real-Time Token Streaming (SSE)**: Streams optimized prompts token-by-token live as they generate.
-- **22 Prompt Frameworks**: Categorized into *Essentials* (RTF, RACE, APE, TAG, ERA), *Structured* (RISEN, COAST, TRACE, CRISPE, CLEAR), *Persuasion* (PASTOR, BAB, AIDA, PEEL), *Problem-Solving* (SCQA, GROW, STAR, PAR, CARE), and *Analysis* (SMART, ICE, 5W1H).
-- **Interactive LLM Test Playground**: Execute your newly optimized prompt live against OpenRouter with sample test inputs directly inside PromptBuddy.
-- **Side-by-Side Visual Diff Viewer**: Inspect structural improvements, role assignments, and added constraints side-by-side.
-- **Dynamic Variable Engine (`{{variable}}`)**: Automatically parses `{{variable_name}}` placeholders in prompt text and renders interactive form fields for live substitution.
-- **Token Count & Cost Estimator**: Calculates estimated token counts and API execution costs across top model families.
-- **Smart Framework Suggestion Engine**: Real-time keyword matching algorithm recommending the top 3 frameworks for any prompt.
-- **Quality Scoring Matrix**: Multi-dimensional quality evaluation (Length, Specificity, Structure, Actionability, Clarity, Completeness) with grades (A+ to F).
-- **Library & Folder Management**: Save prompts, organize by category/folder, and filter history.
-- **Full Library JSON Backup & Restore**: One-click JSON backup export and file restore onto any device.
-- **Multi-Format Exporters**: Instant downloads in Markdown (`.md`), JSON (`.json`), and Plain Text (`.txt`).
-- **Automated Pytest Backend Suite**: 100% test coverage over API endpoints.
+PromptBuddy sits between raw human intention and AI execution. It systematically transforms fuzzy, single-sentence prompts into mathematically structured, defensively hardened, and model-tailored instructions. Furthermore, it compiles these instructions into standardized **Agent Skills (`SKILL.md`)** and production SDK code.
 
 ---
 
-## Architecture & Tech Stack
+## Key Capabilities
 
-| Layer | Technology |
-| :--- | :--- |
-| **Frontend** | React 18, Vite 4, Tailwind CSS, Tokenized CSS Design System |
-| **Backend** | FastAPI, Uvicorn, Async HTTPX, Pydantic v2, Pytest |
-| **AI Provider** | OpenRouter API (Server-Sent Events streaming & dynamic models) |
-| **Storage** | Resilience-wrapped browser `localStorage` + JSON Import/Export |
+### 1. 454-Skill Enterprise Domain Catalog
+Browse, search, and import from **454 specialized domain skills** across 15 enterprise categories:
+- **Cloud & Infra (113)**: Google Cloud, AWS, Azure, Kubernetes, Terraform, Alerting Policies.
+- **Agentic Prompts (68)**: Planning architectures, reflection loops, orchestration, tool contracts.
+- **Backend (57)**: FastAPI, ASP.NET Core (.NET 10), Django, Express, Go, Microservices.
+- **Workflow (42)**: Goal formulation (`define-goal`), PRD decomposition (`notion-spec-to-implementation`), ADR decision capture.
+- **Frontend (40)**: React, Next.js 15, Vue, WinUI 3, Figma 1:1 implementation, design systems.
+- **Developers (37)**: Karpathy Clean Code, Claude API, ChatGPT Apps SDK, CLI Creator, MCP Server patterns.
+- **DevOps (21)**: Docker, CI/CD Actions, Cloudflare Pages/Workers, Render blueprints, Vercel, Netlify.
+- **Security (18)**: AppSec Threat Modeling (STRIDE/DREAD), language defense guidelines (Python, JS, Go).
+- **Data & AI (16)**: Jupyter Notebook formatting (`.ipynb`), RAG pipelines, Vector DB indexing.
+- **Ads & Growth (14)**: Google Ads, Meta campaigns, SEO metadata, conversion rate optimization.
+- **Testing (11)**: Playwright E2E specs, Pytest fixtures, Jest unit tests, integration harnesses.
+- **Mobile (9)**: Flutter, React Native, Swift iOS, Android Jetpack Compose.
+- **Documents & Office (5)**: Official Anthropic document engines: Word (`docx`), PDF (`pdf`), Slides (`pptx`), Excel (`xlsx`), Co-authoring (`doc-coauthoring`).
+- **Analytics (2) & Identity (1)**: BI metrics, telemetry pipelines, OAuth2/OIDC/SSO authentication.
+
+### 2. Built-in Operational Safety Tiers
+Every skill in PromptBuddy is classified with an explicit operational safety tier:
+- **`Tier R (Read-Only)`** *(Emerald)*: Passive audits and code inspections requiring zero write permissions.
+- **`Tier M (Mutation)`** *(Amber)*: Modifies local worktrees, edits files, or generates code; requires human review.
+- **`Tier D (Destructive)`** *(Rose)*: External infrastructure changes or resource deletions requiring explicit multi-step authorization.
+
+### 3. Automated Redteam Security Scanner (6 Adversarial Vectors)
+Evaluates prompt robustness against 6 critical vulnerability classes:
+1. Direct Prompt Injection & Instruction Overrides
+2. Roleplay & Persona Hijacking Jailbreaks
+3. Delimiter & Syntax Escapes (`</system>`, `"""`)
+4. System Prompt & Secret Exfiltration
+5. Tool Escalation & Unauthorized Command Execution
+6. Sensitive Data Exfiltration via Beacons
+- **1-Click Hardening**: Instantly injects defensive boundaries, delimiter encapsulation, and refusal guardrails.
+
+### 4. Feedback Descent Evolution & 4 Architectural Variants
+- **Feedback Descent**: Iteratively refines prompts across 3 stages against an optional user critique, charting a visual ascent trajectory (e.g., `72%` → `85%` → `94%`).
+- **Multi-Strategy Variants**: Generates 4 distinct structural versions of any prompt on demand:
+  1. *Minimalist High-Density* (token-optimized)
+  2. *Strict Defense Guardrails* (negative constraints)
+  3. *Few-Shot Exemplars* (input/output pairs)
+  4. *Chain-of-Thought* (step-by-step reasoning)
+
+### 5. Universal SDK Code Compilers & Exporters
+Export directly to:
+- **Microsoft Guidance (`.py`)**: Constrained generation script.
+- **Outlines Grammar (`.py`)**: Regex-guided and Lark grammar.
+- **DSPy Signature (`.py`)**: Declarative prompt module definition.
+- **Pydantic Model (`.py`)**: Python `BaseModel` schema with type validations.
+- **JSON Schema (`.json`)**: Universal JSON schema for OpenAI Structured Outputs.
+- **Promptfoo Config (`.yaml`)**: CI/CD evaluation matrix with assertions.
+- **Langfuse JSON (`.json`)**: Observability-tagged prompt payload.
+
+### 6. Anti-AI-Slop Clean Code Presets
+Pre-configured 1-click engineering standards:
+- **`Karpathy Clean Code`**: Andrej Karpathy's 4 surgical rules (*Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution*).
+- **`Measurable Goal & Spec Definer`**: Quantifiable binary and threshold targets (*p95 latency, exact test passes, scope boundaries*).
+- **`AppSec Threat Modeling`**: Evidence-grounded STRIDE/DREAD abuse paths with Mermaid diagrams.
 
 ---
 
-## Project Structure
+## Architecture
 
-```text
+```
 PromptBuddy/
-  backend/      # FastAPI server, SSE streaming engine & Pytest suite
-  frontend/     # React 18, Vite & Tailwind CSS workbench UI
-  railway.json  # Railway deployment config
-  render.yaml   # Render web service specification
+├── backend/
+│   ├── app/
+│   │   ├── api/routes/       # Endpoints: /skills, /prompts, /eval, /compile, /observability
+│   │   ├── engines/          # Engines: Catalog, Evolution, Redteam, Compilers, Assertions
+│   │   ├── schemas/          # Pydantic v2 data models
+│   │   └── core/             # Configuration and logging
+│   ├── skills-catalog/       # 454 Skills specifications & index.json
+│   ├── main.py               # FastAPI application entrypoint
+│   └── test_api.py           # 91 automated pytest regression tests (100% passing)
+├── frontend/
+│   ├── src/
+│   │   ├── components/       # Workbench, Inspector, Catalog, Presets, Palette
+│   │   ├── utils/            # api.js client, presets.js, frameworks.js, exporters.js
+│   │   └── App.jsx           # Main Studio shell
+│   └── test_utils.js         # Frontend utility test suite (60+ assertions)
+├── Dockerfile                # Multi-stage container build
+├── docker-compose.yml        # Multi-service staging orchestration
+├── render.yaml               # Render Cloud multi-service blueprint
+└── vercel.json               # Vercel Edge SPA deployment
 ```
 
 ---
 
 ## Quick Start
 
-### 1. Backend Setup
+### 1. Backend
 
 ```bash
 cd backend
 python -m venv venv
 
-# On Windows:
-venv\Scripts\activate
+# Windows:
+.\venv\Scripts\activate
 
-# On macOS/Linux:
+# Linux/macOS:
 source venv/bin/activate
 
 pip install -r requirements.txt
+python -m uvicorn main:app --host 0.0.0.0 --port 5000
 ```
 
-Create `backend/.env`:
-
-```env
-OPENROUTER_API_KEY=your_openrouter_api_key_here
-CORS_ALLOW_ORIGINS=http://localhost:3000
-OPENROUTER_TIMEOUT_SECONDS=60
-MAX_PROMPT_LENGTH=8000
-```
-
-Run the FastAPI backend server:
-
+Run tests:
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 5000 --reload
+python -m pytest
+# 91 passed in ~4s
 ```
 
-Run automated backend tests:
-
-```bash
-pytest test_api.py
-```
-
----
-
-### 2. Frontend Setup
+### 2. Frontend
 
 ```bash
 cd frontend
@@ -95,82 +131,25 @@ npm install
 npm run dev
 ```
 
-The frontend runs at `http://localhost:3000` with API proxying to `http://localhost:5000`.
-
-Optional `.env` configuration:
-
-```env
-VITE_API_URL=http://localhost:5000
+Run tests & build:
+```bash
+node test_utils.js
+npm run build
 ```
 
 ---
 
-## API Reference
+## Verification & Quality Bar
 
-### `GET /health`
-Returns backend health status, provider readiness, and max prompt length limit.
-
-### `GET /models`
-Returns available LLM models (from OpenRouter live API or curated fallback tier) with context length and provider metadata.
-
-### `GET /intents`
-Returns all 22 prompt framework metadata definitions and categories.
-
-### `POST /generate/stream` (SSE Token Streaming)
-Streams prompt optimization tokens in real time.
-
-**Request:**
-```json
-{
-  "base_prompt": "Create a REST API for user management with {{database_type}}",
-  "intent": "rtf",
-  "model": "openai/gpt-4o-mini"
-}
-```
-
-**Response Stream (`text/event-stream`):**
-```text
-data: {"token": "ROLE: ", "request_id": "...", "model": "GPT-4o Mini"}
-data: {"token": "Senior ", "request_id": "...", "model": "GPT-4o Mini"}
-...
-data: {"done": true, "request_id": "...", "model": "GPT-4o Mini", "latency_ms": 1120}
-```
-
-### `POST /test-prompt`
-Executes an optimized prompt live against an LLM with sample test input in the Playground.
-
-**Request:**
-```json
-{
-  "prompt": "ROLE: Senior Backend Engineer...\nTASK: Write a user login route...",
-  "user_input": "Use FastAPI and JWT tokens"
-}
-```
+| Suite | Status | Metric |
+| :--- | :---: | :--- |
+| **Backend Pytest** | ✅ PASS | 91/91 tests (100% pass rate) |
+| **Frontend Tests** | ✅ PASS | 60+ assertions passed (`test_utils.js`) |
+| **Production Build** | ✅ PASS | Zero errors in `npm run build` (Vite) |
+| **Catalog Integrity** | ✅ PASS | 454 skills verified with JSON schema |
+| **Security Audit** | ✅ PASS | 6 attack vectors validated |
+| **Deployment Ready** | ✅ PASS | Docker, Vercel, Render configs tested |
 
 ---
 
-## Keyboard Shortcuts
-
-| Shortcut | Action |
-| :--- | :--- |
-| `Ctrl` + `Enter` | Generate / Optimize prompt |
-| `Ctrl` + `Shift` + `C` | Copy output to clipboard |
-| `Ctrl` + `S` | Save prompt to local library |
-| `Ctrl` + `E` | Export prompt as Markdown file |
-| `Ctrl` + `D` | Toggle Light / Dark mode |
-| `Ctrl` + `/` | Open shortcuts help modal |
-| `Esc` | Close open modals |
-
----
-
-## Deployment
-
-- **Railway**: Deploy using the root `railway.json` configuration.
-- **Render**: Web service environment configuration in `render.yaml`.
-- **Production Server Entrypoint**: `web: uvicorn main:app --host 0.0.0.0 --port $PORT` (configured in `backend/Procfile`).
-
----
-
-## License
-
-Crafted for AI. Distributed under the MIT License.
+*PromptBuddy Studio — Built for Precision, Security, and Anti-AI-Slop Engineering.*

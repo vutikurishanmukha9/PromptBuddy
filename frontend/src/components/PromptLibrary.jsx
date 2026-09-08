@@ -37,6 +37,19 @@ const PromptLibrary = ({ isOpen, onClose, onLoadPrompt }) => {
     }
   }, [isOpen]);
 
+  // Handle escape key to close library
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   const handleDelete = (id) => {
     if (!window.confirm('Delete this prompt template from your library?')) return;
     deletePrompt(id);

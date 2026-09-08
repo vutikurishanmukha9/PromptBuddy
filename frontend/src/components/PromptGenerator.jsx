@@ -88,8 +88,29 @@ const PromptGenerator = ({ externalCommand }) => {
       setShowPresets(true);
     } else if (externalCommand.type === 'import_skill') {
       handleImportSkill(externalCommand.value);
+    } else if (externalCommand.type === 'close_modals') {
+      setShowLibrary(false);
+      setShowPresets(false);
     }
   }, [externalCommand]);
+
+  // Global Escape key dismiss for child modals
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (showPresets) {
+          e.preventDefault();
+          setShowPresets(false);
+        }
+        if (showLibrary) {
+          e.preventDefault();
+          setShowLibrary(false);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showPresets, showLibrary]);
 
   // Sync studioMode with intent
   const handleModeSwitch = (mode) => {
