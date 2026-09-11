@@ -2,12 +2,23 @@
 // Connects frontend workbench directly to backend engines
 
 const getApiBaseUrl = () => {
-  if (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
+  // 1. Vite build-time static replacement
+  const viteUrl = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) ? import.meta.env.VITE_API_URL : null;
+  if (viteUrl) {
+    return viteUrl.replace(/\/+$/, '');
   }
+
+  // 2. Node/SSR fallback
   if (typeof process !== 'undefined' && process?.env?.VITE_API_URL) {
-    return process.env.VITE_API_URL;
+    return process.env.VITE_API_URL.replace(/\/+$/, '');
   }
+
+  // 3. Browser runtime fallback: On any remote hosted domain (e.g. Vercel), default directly to live Render backend
+  if (typeof window !== 'undefined' && window.location && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return 'https://promptbuddy-api.onrender.com';
+  }
+
+  // 4. Localhost development fallback
   return 'http://localhost:5000';
 };
 
