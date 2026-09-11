@@ -2,7 +2,7 @@
 
 > **Version:** 4.2.0  
 > **Tech Stack:** React 18, Vite 4, Tailwind CSS, FastAPI, Uvicorn, Pydantic v2  
-> **Catalog:** 454 Production Domain Skills Across 15 Enterprise Categories  
+> **Catalog:** 496 Production Domain Skills Across 15 Enterprise Categories  
 > **Frameworks:** 22 Industrial Prompt Engineering Frameworks
 
 **PromptBuddy** is an enterprise-grade **Prompt & Skill Engineering Studio**. It solves the single largest failure mode in production Generative AI: **LLM Output Degradation ("AI Slop")** caused by vague, under-constrained, hallucination-prone prompts and unstructured instructions.
@@ -13,19 +13,19 @@ PromptBuddy sits between raw human intention and AI execution. It systematically
 
 ## Key Capabilities
 
-### 1. 454-Skill Enterprise Domain Catalog
-Browse, search, and import from **454 specialized domain skills** across 15 enterprise categories:
+### 1. 496-Skill Enterprise Domain Catalog
+Browse, search, and import from **496 specialized domain skills** across 15 enterprise categories:
 - **Cloud & Infra (113)**: Google Cloud, AWS, Azure, Kubernetes, Terraform, Alerting Policies.
-- **Agentic Prompts (68)**: Planning architectures, reflection loops, orchestration, tool contracts.
-- **Backend (57)**: FastAPI, ASP.NET Core (.NET 10), Django, Express, Go, Microservices.
-- **Workflow (42)**: Goal formulation (`define-goal`), PRD decomposition (`notion-spec-to-implementation`), ADR decision capture.
-- **Frontend (40)**: React, Next.js 15, Vue, WinUI 3, Figma 1:1 implementation, design systems.
-- **Developers (37)**: Karpathy Clean Code, Claude API, ChatGPT Apps SDK, CLI Creator, MCP Server patterns.
-- **DevOps (21)**: Docker, CI/CD Actions, Cloudflare Pages/Workers, Render blueprints, Vercel, Netlify.
-- **Security (18)**: AppSec Threat Modeling (STRIDE/DREAD), language defense guidelines (Python, JS, Go).
+- **Agentic Prompts (72)**: Subagent-Driven Development, Superpowers Discipline, Planning architectures, reflection loops, orchestration, tool contracts.
+- **Backend (59)**: API & Interface Design, Deprecation & Migration, FastAPI, ASP.NET Core, Django, Express, Go, Microservices.
+- **Workflow (53)**: Spec-Driven Development, Brainstorming, Planning Breakdown, Doubt-Driven Dev, Goal formulation (`define-goal`), ADR decision capture.
+- **Developers (50)**: Gemini API Suite, Code Review & Quality, Code Simplification, Context Engineering, Systematic Debugging, Karpathy Clean Code, Claude API.
+- **Frontend (42)**: Frontend UI Engineering (Addy Osmani), Performance Optimization, React, Next.js, Vue, Figma 1:1, design systems.
+- **DevOps (26)**: Git Worktrees, CI/CD Automation, Git Workflow & Versioning, Shipping & Launch, Docker, Cloudflare Pages/Workers, Render, Vercel.
+- **Security (19)**: Security & Hardening, AppSec Threat Modeling (STRIDE/DREAD), language defense guidelines (Python, JS, Go).
 - **Data & AI (16)**: Jupyter Notebook formatting (`.ipynb`), RAG pipelines, Vector DB indexing.
+- **Testing (15)**: Superpowers TDD, Addy Osmani TDD, Browser Testing with DevTools, Verification Before Completion, Playwright, Pytest, Jest.
 - **Ads & Growth (14)**: Google Ads, Meta campaigns, SEO metadata, conversion rate optimization.
-- **Testing (11)**: Playwright E2E specs, Pytest fixtures, Jest unit tests, integration harnesses.
 - **Mobile (9)**: Flutter, React Native, Swift iOS, Android Jetpack Compose.
 - **Documents & Office (5)**: Official Anthropic document engines: Word (`docx`), PDF (`pdf`), Slides (`pptx`), Excel (`xlsx`), Co-authoring (`doc-coauthoring`).
 - **Analytics (2) & Identity (1)**: BI metrics, telemetry pipelines, OAuth2/OIDC/SSO authentication.
