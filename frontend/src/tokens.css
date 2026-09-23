@@ -1,10 +1,10 @@
-/* Enterprise Design Tokens | PromptBuddy Studio | Tone: quiet craft | Anchor: carbon monochrome */
+/* Enterprise Design Tokens | PromptBuddy Studio | Tone: quiet craft | Palette: Warm Alabaster & Chromatic Aura (Zero Blue) */
 :root {
-  --color-paper: #fafafa;
-  --color-paper-2: #f4f4f5;
+  --color-paper: #faf8f5;
+  --color-paper-2: #f3efe8;
   --color-ink: #09090b;
   --color-ink-2: #52525b;
-  --color-rule: #e4e4e7;
+  --color-rule: #e6e2da;
   --color-accent-token: #18181b;
   --color-accent-ink: #ffffff;
   --color-focus: #18181b;

@@ -36,6 +36,16 @@ function App() {
 
   return (
     <div className="app-shell">
+      {/* Ambient Chromatic Canvas (Pure Class & Luxury Atmosphere - Zero Blue) */}
+      <div className="ambient-chromatic-canvas" aria-hidden="true">
+        <div className="ambient-orb ambient-orb--amber" />
+        <div className="ambient-orb ambient-orb--rose" />
+        <div className="ambient-orb ambient-orb--plum" />
+        <div className="ambient-orb ambient-orb--emerald" />
+        <div className="ambient-orb ambient-orb--peach" />
+        <div className="ambient-mesh-lattice" />
+      </div>
+
       {/* Enterprise Top Navigation Bar */}
       <header className="top-navbar">
         <div className="top-navbar__inner">

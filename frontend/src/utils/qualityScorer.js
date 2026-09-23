@@ -152,7 +152,7 @@ export const calculateQualityScore = (promptText) => {
     let grade, gradeColor;
     if (overall >= 90) { grade = 'A+'; gradeColor = 'text-green-600'; }
     else if (overall >= 80) { grade = 'A'; gradeColor = 'text-green-500'; }
-    else if (overall >= 70) { grade = 'B'; gradeColor = 'text-blue-500'; }
+    else if (overall >= 70) { grade = 'B'; gradeColor = 'text-violet-600'; }
     else if (overall >= 60) { grade = 'C'; gradeColor = 'text-yellow-500'; }
     else if (overall >= 50) { grade = 'D'; gradeColor = 'text-orange-500'; }
     else { grade = 'F'; gradeColor = 'text-red-500'; }
